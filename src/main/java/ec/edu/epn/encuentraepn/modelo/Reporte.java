@@ -161,6 +161,13 @@ public class Reporte {
         reportePerdido = perdido;
     }
 
+    /**
+     * HU-22: quien publicó el reporte corrige el lugar donde perdió o encontró el objeto.
+     */
+    public void corregirUbicacion(Ubicacion nueva) {
+        ubicacion = nueva;
+    }
+    
     /** HU-14: distancia en metros entre el lugar de este reporte y el de otro. */
     public double distanciaA(Reporte otro) {
         return ubicacion.distanciaA(otro.ubicacion);
