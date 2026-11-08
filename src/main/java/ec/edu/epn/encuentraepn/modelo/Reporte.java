@@ -212,6 +212,13 @@ public class Reporte {
         return id;
     }
 
+    /**
+     * HU-22: un reporte se puede corregir mientras está activo.
+     */
+    public boolean sePuedeCorregir() {
+        return estado == EstadoReporte.ACTIVO;
+    }
+
     public TipoReporte getTipo() {
         return tipo;
     }
