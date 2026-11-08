@@ -211,6 +211,14 @@ public class Reporte {
         return tipo == TipoReporte.ENCONTRADO;
     }
 
+    /**
+     * HU-23: días que le quedan al reporte antes de vencer; 0 si ya venció.
+     */
+    public int diasParaVencer(LocalDate hoy) {
+        long transcurridos = hoy.toEpochDay() - inicioVigencia.toEpochDay();
+        return (int) Math.max(0, 60 - transcurridos);
+    }
+    
     public boolean estaActivo() {
         return estado == EstadoReporte.ACTIVO;
     }
