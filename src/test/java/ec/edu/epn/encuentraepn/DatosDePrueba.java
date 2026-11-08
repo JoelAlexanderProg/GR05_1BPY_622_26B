@@ -54,6 +54,15 @@ public final class DatosDePrueba {
     }
 
     /**
+     * HU-24: reporte de la calculadora que encontró Bruno Salas, publicado el día indicado.
+     */
+    public static Reporte reportePublicadoEl(LocalDate fecha) {
+        Reporte reporte = reporteEncontrado(new Usuario("Bruno Salas", "bruno.salas@epn.edu.ec"));
+        reporte.publicar(fecha);
+        return reporte;
+    }
+
+    /**
      * Reporte de un objeto encontrado de la categoría y la zona indicadas.
      */
     public static Reporte reporteDe(String categoria, String zona) {

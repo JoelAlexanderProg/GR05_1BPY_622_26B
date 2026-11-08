@@ -56,6 +56,9 @@ public class Reporte {
 
     private LocalDateTime fechaDevolucion;
 
+    /** HU-24: día desde el que cuenta la vigencia del reporte: su publicación o su última renovación. */
+    private LocalDate inicioVigencia;
+
     @ManyToOne(optional = false)
     private Usuario autor;
 
@@ -94,6 +97,13 @@ public class Reporte {
     // SEC-01 · 10: publicar()
     public void publicar() {
         cambiarEstado(EstadoReporte.BORRADOR, EstadoReporte.ACTIVO);
+    }
+
+    /**
+     * HU-24: publica el reporte el día indicado; desde ese día cuenta su vigencia.
+     */
+    public void publicar(LocalDate hoy) {
+        publicar();
     }
 
     // SEC-04 · 18: reservar()
@@ -230,6 +240,10 @@ public class Reporte {
 
     public LocalDateTime getFechaDevolucion() {
         return fechaDevolucion;
+    }
+
+    public LocalDate getInicioVigencia() {
+        return inicioVigencia;
     }
 
     public Usuario getAutor() {
