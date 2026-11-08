@@ -1,0 +1,58 @@
+<%@ page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
+<%-- «boundary» VistaAcuerdoEntrega (CU-04): mostrarPropuesta(acuerdo), confirmarAcuerdo(id);
+     HU-20: solicitarOtraFecha(id, fecha) --%>
+<c:set var="titulo" value="Acuerdo de entrega"/>
+<%@ include file="/WEB-INF/vistas/comun/cabecera.jspf" %>
+
+<h1>Acuerdo de entrega</h1>
+<dl class="datos" id="propuesta">
+    <dt>Objeto</dt><dd><c:out value="${acuerdo.reclamacion.objeto.descripcionPublica}"/></dd>
+    <dt>Lugar</dt><dd><c:out value="${acuerdo.lugar}"/></dd>
+    <%-- HU-21: el reclamante ve dónde queda el punto oficial y cuándo atiende --%>
+    <c:if test="${not empty acuerdo.punto}">
+        <dt>Punto oficial</dt>
+        <dd id="punto"><c:out value="${acuerdo.punto.nombre}"/> · <c:out value="${acuerdo.punto.referencia}"/>
+            · atiende ${acuerdo.punto.horario}</dd>
+    </c:if>
+    <dt>Fecha propuesta</dt><dd>${fn:replace(acuerdo.fechaPropuesta, 'T', ' ')}</dd>
+    <dt>Estado de la reclamación</dt><dd id="estadoReclamacion">${acuerdo.reclamacion.estado.etiqueta}</dd>
+    <dt>Confirmación</dt>
+    <dd id="confirmacionAcuerdo">
+        ${acuerdo.estaConfirmado() ? fn:replace(acuerdo.fechaConfirmacion, 'T', ' ') : 'Pendiente'}
+    </dd>
+    <c:if test="${acuerdo.hayFechaSolicitada()}">
+        <dt>Nueva fecha solicitada</dt>
+        <dd id="fechaSolicitada">${fn:replace(acuerdo.fechaSolicitada, 'T', ' ')} (esperando que la acepte quien encontró el objeto)</dd>
+    </c:if>
+</dl>
+
+<%-- confirmarAcuerdo(id) --%>
+<c:if test="${esReclamante and not acuerdo.estaConfirmado()}">
+    <form method="post" action="${ctx}/devoluciones" class="acciones">
+        <input type="hidden" name="accion" value="confirmarAcuerdo">
+        <input type="hidden" name="id" value="${acuerdo.reclamacion.id}">
+        <button type="submit" class="boton" id="confirmarAcuerdo">Confirmar acuerdo</button>
+    </form>
+</c:if>
+
+<%-- HU-20: si no puede asistir, el reclamante pide otra fecha antes de confirmar --%>
+<c:if test="${esReclamante and not acuerdo.estaConfirmado() and not acuerdo.hayFechaSolicitada()}">
+    <h2>¿No puede asistir?</h2>
+    <form method="post" action="${ctx}/devoluciones" class="formulario" id="formularioOtraFecha">
+        <input type="hidden" name="accion" value="solicitarFecha">
+        <input type="hidden" name="id" value="${acuerdo.reclamacion.id}">
+        <label for="nuevaFecha">Pida otra fecha y hora para la entrega</label>
+        <input type="datetime-local" id="nuevaFecha" name="nuevaFecha" required>
+        <div class="acciones">
+            <button type="submit" class="boton secundario" id="pedirFecha">Pedir otra fecha</button>
+        </div>
+    </form>
+</c:if>
+
+<div class="acciones">
+    <a href="${ctx}/inicio">Volver al inicio</a>
+</div>
+
+<%@ include file="/WEB-INF/vistas/comun/pie.jspf" %>
