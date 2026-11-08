@@ -104,6 +104,7 @@ public class Reporte {
      */
     public void publicar(LocalDate hoy) {
         publicar();
+        inicioVigencia = hoy;
     }
 
     // SEC-04 · 18: reservar()
