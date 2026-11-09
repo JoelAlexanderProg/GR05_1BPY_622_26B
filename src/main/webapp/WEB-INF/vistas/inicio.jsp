@@ -19,6 +19,9 @@
     <c:if test="${param.renovado != null}">
         <p class="exito" id="renovado">El reporte se renovó y vuelve a aparecer en el mapa.</p>
     </c:if>
+    <c:if test="${param.corregido != null}">
+        <p class="exito" id="corregido">El reporte se corrigió. Así lo verán quienes buscan en el mapa.</p>
+    </c:if>
     <c:choose>
         <c:when test="${empty misReportes}">
             <p class="vacio">Todavía no ha registrado reportes.</p>
@@ -62,6 +65,10 @@
                             <%-- HU-14: un objeto perdido activo puede tener objetos encontrados que coinciden --%>
                             <c:if test="${not reporte.esEncontrado() and reporte.estaActivo()}">
                                 <a href="${ctx}/coincidencias?reporte=${reporte.id}">Coincidencias</a>
+                            </c:if>
+                            <%-- HU-22: un reporte se corrige mientras está activo --%>
+                            <c:if test="${reporte.sePuedeCorregir()}">
+                                <a class="corregir" href="${ctx}/reportes/corregir?id=${reporte.id}">Corregir</a>
                             </c:if>
                             <%-- HU-23: un reporte activo se renueva cuando está por vencer o ya venció --%>
                             <c:if test="${reporte.estaActivo() and (reporte.estaPorVencer(hoy) or not reporte.estaVigente(hoy))}">

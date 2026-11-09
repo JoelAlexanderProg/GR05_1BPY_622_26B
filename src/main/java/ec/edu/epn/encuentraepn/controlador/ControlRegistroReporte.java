@@ -28,10 +28,14 @@ import java.util.UUID;
 /**
  * CU-01 Registrar objeto perdido o encontrado.
  * Diagrama de clases: «control» ControlRegistroReporte. Vista: formularioReporte.jsp («boundary» FormularioReporte).
- * Diagrama de secuencia: SEC-01. También permite a su autor retirar un reporte (HU-11) y renovarlo (HU-23).
+ * Diagrama de secuencia: SEC-01. También permite a su autor retirar un reporte (HU-11), renovarlo (HU-23)
+ * y corregirlo (HU-22, vista formularioCorreccion.jsp).
  */
-@WebServlet({"/reportes/nuevo", "/reportes/retirar", "/reportes/renovar"})
+@WebServlet({"/reportes/nuevo", "/reportes/retirar", "/reportes/renovar", ControlRegistroReporte.RUTA_CORREGIR})
 public class ControlRegistroReporte extends ControlBase {
+
+    /** HU-22: formulario y acción de corregir un reporte propio. */
+    static final String RUTA_CORREGIR = "/reportes/corregir";
 
     /** Motivo con el que se rechazan las reclamaciones pendientes de un reporte retirado (HU-11). */
     public static final String MOTIVO_RETIRO = "El reporte fue retirado por su autor.";
@@ -71,6 +75,11 @@ public class ControlRegistroReporte extends ControlBase {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        if (RUTA_CORREGIR.equals(request.getServletPath())) {
+            // HU-22: el formulario de corrección llega con los datos actuales del reporte
+            mostrarCorreccion(reporteParaCorregir(actorIdentificado(request), leerId(request, "id")), request, response);
+            return;
+        }
         if (request.getParameter("registrado") != null) {
             // SEC-01 · 13-14: mostrarConfirmacion(reporte) → reporte publicado
             request.setAttribute("reporte", reporteDAO.buscarPorId(leerId(request, "registrado")));
@@ -106,6 +115,22 @@ public class ControlRegistroReporte extends ControlBase {
             redirigir(request, response, "/inicio?renovado");
             return;
         }
+        if (RUTA_CORREGIR.equals(request.getServletPath())) {
+            // HU-22: corregirReporte(actor, id, datos); si los datos no son válidos, el formulario muestra el error
+            Usuario actor = actorIdentificado(request);
+            UUID id = leerId(request, "id");
+            try {
+                corregirReporte(actor, id, leerCorreccion(request));
+            } catch (IllegalStateException e) {
+                throw new OperacionInvalidaException("Solo se puede corregir un reporte activo.");
+            } catch (OperacionInvalidaException e) {
+                request.setAttribute("error", e.getMessage());
+                mostrarCorreccion(reporteParaCorregir(actor, id), request, response);
+                return;
+            }
+            redirigir(request, response, "/inicio?corregido");
+            return;
+        }
         // SEC-01 · 3: solicitarPublicacion(datos)
         DatosReporte datos = leerDatos(request);
         UUID perdidoId = leerIdOpcional(request.getParameter(PARAMETRO_PERDIDO));
@@ -119,6 +144,31 @@ public class ControlRegistroReporte extends ControlBase {
             request.setAttribute(PARAMETRO_PERDIDO, perdidoTodaviaDisponible(actor(request), perdidoId));
             mostrarFormulario(request, response);
         }
+    }
+
+    /** HU-22: reporte propio y activo que el actor quiere corregir. */
+    private Reporte reporteParaCorregir(Usuario actor, UUID reporteId) {
+        Reporte reporte = exigirAutor(actor, reporteId, "corregirlo");
+        if (!reporte.sePuedeCorregir()) {
+            throw new OperacionInvalidaException("Solo se puede corregir un reporte activo.");
+        }
+        return reporte;
+    }
+
+    private void mostrarCorreccion(Reporte reporte, HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        request.setAttribute("reporte", reporte);
+        request.setAttribute("categorias", categoriaDAO.listarTodas());
+        mostrar("formularioCorreccion.jsp", request, response);
+    }
+
+    private DatosCorreccion leerCorreccion(HttpServletRequest request) {
+        String descripcion = request.getParameter("descripcion");
+        return new DatosCorreccion(
+                descripcion == null ? "" : descripcion,
+                leerIdOpcional(request.getParameter("categoria")),
+                leerCoordenada(request.getParameter("latitud")),
+                leerCoordenada(request.getParameter("longitud")));
     }
 
     /** HU-15: al corregir el formulario se conserva el aviso, si el reporte de pérdida sigue disponible. */
