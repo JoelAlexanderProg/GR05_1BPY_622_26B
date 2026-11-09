@@ -107,6 +107,13 @@ public class Reporte {
         inicioVigencia = hoy;
     }
 
+    /**
+     * HU-23: quien publicó el reporte lo renueva y vuelve a estar vigente desde ese día.
+     */
+    public void renovar(LocalDate hoy) {
+        inicioVigencia = hoy;
+    }
+
     // SEC-04 · 18: reservar()
     public void reservar() {
         cambiarEstado(EstadoReporte.ACTIVO, EstadoReporte.RESERVADO);
