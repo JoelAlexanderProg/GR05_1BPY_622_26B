@@ -1,5 +1,5 @@
-// Pruebas de aceptación de la iteración 5 (Proyecto 1B): comprueban en el navegador los escenarios de
-// HU-24 Ver solo los reportes vigentes y HU-23 Renovar mi reporte, con una captura por escenario.
+// Pruebas de aceptación de la iteración 5 (Proyecto 1B): comprueban en el navegador los 10 escenarios de
+// HU-24 Ver solo los reportes vigentes, HU-23 Renovar mi reporte y HU-22 Corregir mi reporte, con capturas.
 //
 // Uso:      npm install puppeteer-core
 //           node casos-iteracion-5.js <carpeta de capturas> [URL base]
@@ -153,6 +153,114 @@ SECCIONES.push(async ({ sesion }) => {
   await captura(bruno, 'hu23-e3-reservado-sin-renovar.png');
   paso(3, 'El reportante no puede renovar la mochila, porque ya aceptó la reclamación de su dueño',
     mochila.includes('Reservado') && !renovable);
+});
+
+// ---------------------------------------------------------------------------------------------- HU-22
+/** Lugar correcto del cuaderno: zona Norte del campus (en los datos de ejemplo está marcado en la zona Sur). */
+const LUGAR_CORRECTO = { latitud: -0.2078, longitud: -78.4870 };
+
+/** Desde «Mis reportes», abre el formulario de corrección del reporte con la descripción indicada. */
+async function abrirCorreccion(page, descripcion) {
+  await ir(page, '/inicio');
+  const enlace = await page.$$eval('#misReportes tbody tr', (filas, d) => {
+    const fila = filas.find((f) => f.innerText.includes(d));
+    const corregir = fila && fila.querySelector('a.corregir');
+    return corregir ? corregir.href : null;
+  }, descripcion);
+  await page.goto(enlace, { waitUntil: 'domcontentloaded' });
+}
+
+/** Indica si la fila de «Mis reportes» con la descripción indicada ofrece la acción «Corregir». */
+async function puedeCorregir(page, descripcion) {
+  return page.$$eval('#misReportes tbody tr', (filas, d) => {
+    const fila = filas.find((f) => f.innerText.includes(d));
+    return Boolean(fila && fila.querySelector('a.corregir'));
+  }, descripcion);
+}
+
+async function marcarEnMapa(page, punto) {
+  await page.$eval('#mapa', (m) => m.scrollIntoView({ block: 'center' }));
+  await esperarMapa(page);
+  const posicion = await page.evaluate((p) => {
+    const marco = document.getElementById('mapa').getBoundingClientRect();
+    const pixel = mapa.latLngToContainerPoint([p.latitud, p.longitud]);
+    return { x: marco.x + pixel.x, y: marco.y + pixel.y };
+  }, punto);
+  await page.mouse.click(posicion.x, posicion.y);
+}
+
+/** Elige en un selector la opción con el texto indicado. */
+async function elegir(page, selector, texto) {
+  const valor = await page.$$eval(`${selector} option`, (opciones, t) =>
+    opciones.find((o) => o.textContent.trim() === t).value, texto);
+  await page.select(selector, valor);
+}
+
+/** Lugar del reporte en el mapa: coordenadas del marcador y zona que muestra la lista de resultados. */
+async function lugarEnMapa(page, descripcion) {
+  return page.$$eval('#resultados li', (items, d) => {
+    const item = items.find((i) => i.innerText.includes(d));
+    return item ? { latitud: Number(item.dataset.latitud), longitud: Number(item.dataset.longitud),
+      zona: (item.querySelector('small').innerText.match(/Zona (\w+)/) || [])[1] } : null;
+  }, descripcion);
+}
+
+/** Aplica en el mapa el filtro de la categoría indicada y devuelve los reportes que quedan. */
+async function filtrarPorCategoria(page, categoria) {
+  await ir(page, '/reportes');
+  await elegir(page, 'form.filtros select[name="categoria"]', categoria);
+  await enviar(page, 'form.filtros button[type="submit"]');
+  return reportesEnMapa(page);
+}
+
+SECCIONES.push(async ({ sesion }) => {
+  caso('HU-22', 'Corregir mi reporte');
+  const bruno = await sesion(BRUNO);
+
+  await abrirCorreccion(bruno, 'Llaves con llavero rojo');
+  await bruno.$eval('#descripcion', (campo) => { campo.value = ''; });
+  await bruno.type('#descripcion', 'Llaves con llavero azul');
+  await captura(bruno, 'hu22-e1-formulario.png');
+  await enviar(bruno, '#correccion button[type="submit"]');
+  const corregido = await textoDe(bruno, '#corregido');
+  const azul = await filaDe(bruno, 'Llaves con llavero azul');
+  const rojo = await filaDe(bruno, 'Llaves con llavero rojo');
+  await resaltarFila(bruno, 'Llaves con llavero azul');
+  await captura(bruno, 'hu22-e1-descripcion-corregida.png');
+  paso(1, 'Tras corregir la descripción, el reportante ve su reporte con el llavero azul',
+    corregido.includes('El reporte se corrigió') && azul !== '' && rojo === '');
+
+  await ir(bruno, '/reportes');
+  const antes = await lugarEnMapa(bruno, 'Cuaderno universitario');
+  await abrirCorreccion(bruno, 'Cuaderno universitario');
+  await marcarEnMapa(bruno, LUGAR_CORRECTO);
+  await captura(bruno, 'hu22-e2-nuevo-lugar.png');
+  await enviar(bruno, '#correccion button[type="submit"]');
+  await ir(bruno, '/reportes');
+  const despues = await lugarEnMapa(bruno, 'Cuaderno universitario');
+  await captura(bruno, 'hu22-e2-lugar-corregido.png');
+  paso(2, 'Tras corregir el lugar, el reportante ve su cuaderno en el lugar correcto del mapa (zona Norte)',
+    antes && antes.zona === 'Sur' && despues && despues.zona === 'Norte'
+    && Math.abs(despues.latitud - LUGAR_CORRECTO.latitud) < 0.0003
+    && Math.abs(despues.longitud - LUGAR_CORRECTO.longitud) < 0.0003);
+
+  const electronicosAntes = await filtrarPorCategoria(bruno, 'Electrónicos');
+  await abrirCorreccion(bruno, 'Cargador de laptop negro');
+  await elegir(bruno, '#categoria', 'Electrónicos');
+  await captura(bruno, 'hu22-e3-nueva-categoria.png');
+  await enviar(bruno, '#correccion button[type="submit"]');
+  const electronicos = await filtrarPorCategoria(bruno, 'Electrónicos');
+  await captura(bruno, 'hu22-e3-filtro-electronicos.png');
+  paso(3, 'Tras cambiarlo a «Electrónicos», el reportante ve su cargador al filtrar el mapa por esa categoría',
+    !electronicosAntes.some((r) => r.includes('Cargador')) && electronicos.some((r) => r.includes('Cargador de laptop negro')));
+
+  await ir(bruno, '/inicio');
+  const mochila = await filaDe(bruno, 'Mochila negra con el logo de la EPN');
+  const corregible = await puedeCorregir(bruno, 'Mochila negra con el logo de la EPN');
+  await resaltarFila(bruno, 'Mochila negra con el logo de la EPN');
+  await captura(bruno, 'hu22-e4-reservado-sin-corregir.png');
+  paso(4, 'El reportante no puede corregir la mochila, porque ya aceptó la reclamación de su dueño',
+    mochila.includes('Reservado') && !corregible);
 });
 
 (async () => {
