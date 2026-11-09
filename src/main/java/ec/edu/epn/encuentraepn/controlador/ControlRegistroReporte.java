@@ -290,8 +290,8 @@ public class ControlRegistroReporte extends ControlBase {
         if (datos.tipo() == null) {
             throw new OperacionInvalidaException("Indique si el objeto está perdido o fue encontrado.");
         }
-        if (datos.descripcionPublica().isEmpty() || datos.descripcionPublica().length() > 200) {
-            throw new OperacionInvalidaException("Escriba una descripción de hasta 200 caracteres.");
+        if (datos.descripcionPublica().isEmpty() || datos.descripcionPublica().length() > Reporte.MAX_DESCRIPCION) {
+            throw new OperacionInvalidaException(Reporte.MENSAJE_DESCRIPCION);
         }
         if (datos.fechaSuceso() == null || datos.fechaSuceso().isAfter(LocalDate.now())) {
             throw new OperacionInvalidaException("Indique una fecha que no sea posterior a hoy.");

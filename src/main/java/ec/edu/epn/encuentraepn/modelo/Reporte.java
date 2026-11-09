@@ -42,6 +42,12 @@ public class Reporte {
     /** HU-23: últimos días de vigencia en los que se avisa al autor que su reporte está por vencer. */
     public static final int DIAS_AVISO_VENCIMIENTO = 7;
 
+    /** HU-22: largo máximo de la descripción pública, al registrar el reporte y al corregirlo. */
+    public static final int MAX_DESCRIPCION = 200;
+
+    /** Mensaje cuando la descripción está vacía o pasa de {@value #MAX_DESCRIPCION} caracteres. */
+    public static final String MENSAJE_DESCRIPCION = "Escriba una descripción de hasta " + MAX_DESCRIPCION + " caracteres.";
+
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
@@ -50,7 +56,7 @@ public class Reporte {
     @Column(nullable = false, length = 12)
     private TipoReporte tipo;
 
-    @Column(nullable = false, length = 200)
+    @Column(nullable = false, length = MAX_DESCRIPCION)
     private String descripcionPublica;
 
     @Column(nullable = false)
@@ -128,13 +134,14 @@ public class Reporte {
     }
     
     /**
-     * HU-22: quien publicó el reporte corrige su descripción. No puede quedar vacía ni pasar de 200 caracteres.
+     * HU-22: quien publicó el reporte corrige su descripción. No puede quedar vacía ni pasar de
+     * {@value #MAX_DESCRIPCION} caracteres.
      */
     public void corregirDescripcion(String nueva) {
         exigirQueSePuedaCorregir();
         String descripcion = nueva.trim();
-        if (descripcion.isEmpty() || descripcion.length() > 200) {
-            throw new IllegalArgumentException("Escriba una descripción de hasta 200 caracteres.");
+        if (descripcion.isEmpty() || descripcion.length() > MAX_DESCRIPCION) {
+            throw new IllegalArgumentException(MENSAJE_DESCRIPCION);
         }
         descripcionPublica = descripcion;
     }
