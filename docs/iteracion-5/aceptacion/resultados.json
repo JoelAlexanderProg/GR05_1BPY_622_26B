@@ -1,0 +1,73 @@
+{
+ "fecha": "2026-11-09",
+ "casos": [
+  {
+   "id": "HU-24",
+   "nombre": "Ver solo los reportes vigentes",
+   "pasos": [
+    {
+     "numero": 1,
+     "esperado": "El miembro ve en el mapa las llaves que se publicaron hace una semana",
+     "cumple": true
+    },
+    {
+     "numero": 2,
+     "esperado": "El miembro no ve en el mapa la chaqueta que se publicó hace tres meses y no se renovó",
+     "cumple": true
+    },
+    {
+     "numero": 3,
+     "esperado": "Al buscar «chaqueta», el miembro ve que ningún reporte coincide con su búsqueda",
+     "cumple": true
+    }
+   ]
+  },
+  {
+   "id": "HU-23",
+   "nombre": "Renovar mi reporte",
+   "pasos": [
+    {
+     "numero": 1,
+     "esperado": "El reportante ve que a su calculadora, publicada hace 55 días, le quedan pocos días para vencer",
+     "cumple": true
+    },
+    {
+     "numero": 2,
+     "esperado": "Tras renovar sus audífonos, cuyo reporte había vencido, el reportante los vuelve a ver en el mapa",
+     "cumple": true
+    },
+    {
+     "numero": 3,
+     "esperado": "El reportante no puede renovar la mochila, porque ya aceptó la reclamación de su dueño",
+     "cumple": true
+    }
+   ]
+  },
+  {
+   "id": "HU-22",
+   "nombre": "Corregir mi reporte",
+   "pasos": [
+    {
+     "numero": 1,
+     "esperado": "Tras corregir la descripción, el reportante ve su reporte con el llavero azul",
+     "cumple": true
+    },
+    {
+     "numero": 2,
+     "esperado": "Tras corregir el lugar, el reportante ve su cuaderno en el lugar correcto del mapa (zona Norte)",
+     "cumple": true
+    },
+    {
+     "numero": 3,
+     "esperado": "Tras cambiarlo a «Electrónicos», el reportante ve su cargador al filtrar el mapa por esa categoría",
+     "cumple": true
+    },
+    {
+     "numero": 4,
+     "esperado": "El reportante no puede corregir la mochila, porque ya aceptó la reclamación de su dueño",
+     "cumple": true
+    }
+   ]
+  }
+ ]
+}

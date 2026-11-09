@@ -1,0 +1,234 @@
+Started by an SCM change
+Obtained Jenkinsfile from git https://github.com/JoelAlexanderProg/GR05_1BPY_622_26B.git
+[Pipeline] Start of Pipeline
+[Pipeline] node
+Running on Jenkins in /var/jenkins_home/workspace/GR05_1BPY_622_26B
+[Pipeline] {
+[Pipeline] stage
+[Pipeline] { (Declarative: Checkout SCM)
+[Pipeline] checkout
+Selected Git installation does not exist. Using Default
+The recommended git tool is: NONE
+No credentials specified
+ > git rev-parse --resolve-git-dir /var/jenkins_home/workspace/GR05_1BPY_622_26B/.git # timeout=10
+Fetching changes from the remote Git repository
+ > git config remote.origin.url https://github.com/JoelAlexanderProg/GR05_1BPY_622_26B.git # timeout=10
+Fetching upstream changes from https://github.com/JoelAlexanderProg/GR05_1BPY_622_26B.git
+ > git --version # timeout=10
+ > git --version # 'git version 2.47.3'
+ > git fetch --tags --force --progress -- https://github.com/JoelAlexanderProg/GR05_1BPY_622_26B.git +refs/heads/*:refs/remotes/origin/* # timeout=10
+ > git rev-parse refs/remotes/origin/main^{commit} # timeout=10
+Checking out Revision 25f71d64cfe0a7c3bbd10f4d0738da80eef10bd1 (refs/remotes/origin/main)
+ > git config core.sparsecheckout # timeout=10
+ > git checkout -f 25f71d64cfe0a7c3bbd10f4d0738da80eef10bd1 # timeout=10
+Commit message: "Docker: la imagen de la aplicación se construye para linux/amd64 y linux/arm64"
+ > git rev-list --no-walk 8a0e973fe4c2b7e4c17891caa9c81bc8e33af2ce # timeout=10
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] withEnv
+[Pipeline] {
+[Pipeline] timeout
+Timeout set to expire in 15 min
+[Pipeline] {
+[Pipeline] stage
+[Pipeline] { (Compilación)
+[Pipeline] sh
++ chmod +x mvnw
+[Pipeline] sh
++ ./mvnw -B clean compile
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] --------------------< ec.edu.epn:GR05_1BPY_622_26B >--------------------
+[INFO] Building EncuentraEPN 1.0
+[INFO]   from pom.xml
+[INFO] --------------------------------[ war ]---------------------------------
+[INFO] 
+[INFO] --- clean:3.2.0:clean (default-clean) @ GR05_1BPY_622_26B ---
+[INFO] Deleting /var/jenkins_home/workspace/GR05_1BPY_622_26B/target
+[INFO] 
+[INFO] --- dependency:3.11.0:properties (default) @ GR05_1BPY_622_26B ---
+[INFO] 
+[INFO] --- resources:3.4.0:resources (default-resources) @ GR05_1BPY_622_26B ---
+[INFO] Copying 1 resource from src/main/resources to target/classes
+[INFO] 
+[INFO] --- compiler:3.16.0:compile (default-compile) @ GR05_1BPY_622_26B ---
+[INFO] Recompiling the module because of changed source code.
+[INFO] Compiling 44 source files with javac [debug release 17] to target/classes
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  8.652 s
+[INFO] Finished at: 2026-11-08T20:16:20-05:00
+[INFO] ------------------------------------------------------------------------
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Pruebas unitarias)
+[Pipeline] sh
++ ./mvnw -B test
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] --------------------< ec.edu.epn:GR05_1BPY_622_26B >--------------------
+[INFO] Building EncuentraEPN 1.0
+[INFO]   from pom.xml
+[INFO] --------------------------------[ war ]---------------------------------
+[INFO] 
+[INFO] --- dependency:3.11.0:properties (default) @ GR05_1BPY_622_26B ---
+[INFO] 
+[INFO] --- resources:3.4.0:resources (default-resources) @ GR05_1BPY_622_26B ---
+[INFO] Copying 1 resource from src/main/resources to target/classes
+[INFO] 
+[INFO] --- compiler:3.16.0:compile (default-compile) @ GR05_1BPY_622_26B ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] --- resources:3.4.0:testResources (default-testResources) @ GR05_1BPY_622_26B ---
+[INFO] skip non existing resourceDirectory /var/jenkins_home/workspace/GR05_1BPY_622_26B/src/test/resources
+[INFO] 
+[INFO] --- compiler:3.16.0:testCompile (default-testCompile) @ GR05_1BPY_622_26B ---
+[INFO] Recompiling the module because of changed source code.
+[INFO] Compiling 32 source files with javac [debug release 17] to target/test-classes
+[INFO] 
+[INFO] --- surefire:3.5.6:test (default-test) @ GR05_1BPY_622_26B ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running ec.edu.epn.encuentraepn.controlador.ControlOtraFechaTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 5.119 s -- in ec.edu.epn.encuentraepn.controlador.ControlOtraFechaTest
+[INFO] Running ec.edu.epn.encuentraepn.controlador.ControlCoincidenciasTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.441 s -- in ec.edu.epn.encuentraepn.controlador.ControlCoincidenciasTest
+[INFO] Running ec.edu.epn.encuentraepn.controlador.ControlRegistroHallazgoTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.304 s -- in ec.edu.epn.encuentraepn.controlador.ControlRegistroHallazgoTest
+[INFO] Running ec.edu.epn.encuentraepn.controlador.ControlAvisoCoincidenciaTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.258 s -- in ec.edu.epn.encuentraepn.controlador.ControlAvisoCoincidenciaTest
+[INFO] Running ec.edu.epn.encuentraepn.controlador.ControlPuntoEntregaTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.340 s -- in ec.edu.epn.encuentraepn.controlador.ControlPuntoEntregaTest
+[INFO] Running ec.edu.epn.encuentraepn.controlador.ControlRegistroReporteTest
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.238 s -- in ec.edu.epn.encuentraepn.controlador.ControlRegistroReporteTest
+[INFO] Running ec.edu.epn.encuentraepn.controlador.ControlAvisoReclamacionTest
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.074 s -- in ec.edu.epn.encuentraepn.controlador.ControlAvisoReclamacionTest
+[INFO] Running ec.edu.epn.encuentraepn.controlador.ControlDevolucionesTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.023 s -- in ec.edu.epn.encuentraepn.controlador.ControlDevolucionesTest
+[INFO] Running ec.edu.epn.encuentraepn.controlador.ControlCancelacionTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.114 s -- in ec.edu.epn.encuentraepn.controlador.ControlCancelacionTest
+[INFO] Running ec.edu.epn.encuentraepn.controlador.ControlAvisosTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.040 s -- in ec.edu.epn.encuentraepn.controlador.ControlAvisosTest
+[INFO] Running ec.edu.epn.encuentraepn.modelo.ReporteCorreccionDescripcionTest
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.522 s -- in ec.edu.epn.encuentraepn.modelo.ReporteCorreccionDescripcionTest
+[INFO] Running ec.edu.epn.encuentraepn.modelo.AvisoReclamacionTest
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.299 s -- in ec.edu.epn.encuentraepn.modelo.AvisoReclamacionTest
+[INFO] Running ec.edu.epn.encuentraepn.modelo.EstadisticasReportesTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.045 s -- in ec.edu.epn.encuentraepn.modelo.EstadisticasReportesTest
+[INFO] Running ec.edu.epn.encuentraepn.modelo.AvisoTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.063 s -- in ec.edu.epn.encuentraepn.modelo.AvisoTest
+[INFO] Running ec.edu.epn.encuentraepn.modelo.ReporteRenovacionTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.021 s -- in ec.edu.epn.encuentraepn.modelo.ReporteRenovacionTest
+[INFO] Running ec.edu.epn.encuentraepn.modelo.PuntoEntregaTest
+[INFO] Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.362 s -- in ec.edu.epn.encuentraepn.modelo.PuntoEntregaTest
+[INFO] Running ec.edu.epn.encuentraepn.modelo.ReporteCorreccionLugarTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.068 s -- in ec.edu.epn.encuentraepn.modelo.ReporteCorreccionLugarTest
+[INFO] Running ec.edu.epn.encuentraepn.modelo.CoincidenciaTest
+[INFO] Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.219 s -- in ec.edu.epn.encuentraepn.modelo.CoincidenciaTest
+[INFO] Running ec.edu.epn.encuentraepn.modelo.ReclamacionTest
+[INFO] Tests run: 9, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.209 s -- in ec.edu.epn.encuentraepn.modelo.ReclamacionTest
+[INFO] Running ec.edu.epn.encuentraepn.modelo.ReporteVigenciaTest
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.026 s -- in ec.edu.epn.encuentraepn.modelo.ReporteVigenciaTest
+[INFO] Running ec.edu.epn.encuentraepn.modelo.HallazgoTest
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.055 s -- in ec.edu.epn.encuentraepn.modelo.HallazgoTest
+[INFO] Running ec.edu.epn.encuentraepn.modelo.CancelacionTest
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.044 s -- in ec.edu.epn.encuentraepn.modelo.CancelacionTest
+[INFO] Running ec.edu.epn.encuentraepn.modelo.ReporteSePuedeCorregirTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.048 s -- in ec.edu.epn.encuentraepn.modelo.ReporteSePuedeCorregirTest
+[INFO] Running ec.edu.epn.encuentraepn.modelo.ReporteDiasParaVencerTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.027 s -- in ec.edu.epn.encuentraepn.modelo.ReporteDiasParaVencerTest
+[INFO] Running ec.edu.epn.encuentraepn.modelo.ReportePorVencerTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.019 s -- in ec.edu.epn.encuentraepn.modelo.ReportePorVencerTest
+[INFO] Running ec.edu.epn.encuentraepn.modelo.UbicacionTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.067 s -- in ec.edu.epn.encuentraepn.modelo.UbicacionTest
+[INFO] Running ec.edu.epn.encuentraepn.modelo.ReporteCorreccionTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.076 s -- in ec.edu.epn.encuentraepn.modelo.ReporteCorreccionTest
+[INFO] Running ec.edu.epn.encuentraepn.modelo.ReporteCorreccionCategoriaTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.017 s -- in ec.edu.epn.encuentraepn.modelo.ReporteCorreccionCategoriaTest
+[INFO] Running ec.edu.epn.encuentraepn.modelo.OtraFechaTest
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.090 s -- in ec.edu.epn.encuentraepn.modelo.OtraFechaTest
+[INFO] Running ec.edu.epn.encuentraepn.modelo.ReporteVigenteTest
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.103 s -- in ec.edu.epn.encuentraepn.modelo.ReporteVigenteTest
+[INFO] Running ec.edu.epn.encuentraepn.modelo.ReporteTest
+[INFO] Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.283 s -- in ec.edu.epn.encuentraepn.modelo.ReporteTest
+[INFO] 
+[INFO] Results:
+[INFO] 
+[INFO] Tests run: 89, Failures: 0, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  42.559 s
+[INFO] Finished at: 2026-11-08T20:17:08-05:00
+[INFO] ------------------------------------------------------------------------
+Post stage
+[Pipeline] junit
+Recording test results
+[Checks API] No suitable checks publisher found.
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Empaquetado)
+[Pipeline] sh
++ ./mvnw -B -DskipTests package
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] --------------------< ec.edu.epn:GR05_1BPY_622_26B >--------------------
+[INFO] Building EncuentraEPN 1.0
+[INFO]   from pom.xml
+[INFO] --------------------------------[ war ]---------------------------------
+[INFO] 
+[INFO] --- dependency:3.11.0:properties (default) @ GR05_1BPY_622_26B ---
+[INFO] 
+[INFO] --- resources:3.4.0:resources (default-resources) @ GR05_1BPY_622_26B ---
+[INFO] Copying 1 resource from src/main/resources to target/classes
+[INFO] 
+[INFO] --- compiler:3.16.0:compile (default-compile) @ GR05_1BPY_622_26B ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] --- resources:3.4.0:testResources (default-testResources) @ GR05_1BPY_622_26B ---
+[INFO] skip non existing resourceDirectory /var/jenkins_home/workspace/GR05_1BPY_622_26B/src/test/resources
+[INFO] 
+[INFO] --- compiler:3.16.0:testCompile (default-testCompile) @ GR05_1BPY_622_26B ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] --- surefire:3.5.6:test (default-test) @ GR05_1BPY_622_26B ---
+[INFO] Tests are skipped.
+[INFO] 
+[INFO] --- war:3.5.1:war (default-war) @ GR05_1BPY_622_26B ---
+[INFO] Packaging webapp
+[INFO] Assembling webapp [GR05_1BPY_622_26B] in [/var/jenkins_home/workspace/GR05_1BPY_622_26B/target/GR05_1BPY_622_26B]
+[INFO] Processing war project
+[INFO] Copying webapp resources [/var/jenkins_home/workspace/GR05_1BPY_622_26B/src/main/webapp]
+[INFO] Building war: /var/jenkins_home/workspace/GR05_1BPY_622_26B/target/GR05_1BPY_622_26B.war
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  10.272 s
+[INFO] Finished at: 2026-11-08T20:17:30-05:00
+[INFO] ------------------------------------------------------------------------
+[Pipeline] archiveArtifacts
+Archiving artifacts
+Recording fingerprints
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Declarative: Post Actions)
+[Pipeline] echo
+Integración exitosa: el código compila, las pruebas pasan y el WAR está listo.
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] }
+[Pipeline] // timeout
+[Pipeline] }
+[Pipeline] // withEnv
+[Pipeline] }
+[Pipeline] // node
+[Pipeline] End of Pipeline
+Finished: SUCCESS

@@ -1,0 +1,6 @@
+== casos-de-prueba
+TODOS LOS CASOS DE PRUEBA PASARON
+== casos-incremento-4
+TODOS LOS ESCENARIOS SE CUMPLEN
+== casos-release-2
+TODOS LOS ESCENARIOS SE CUMPLEN

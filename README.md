@@ -74,18 +74,35 @@ En total: 14 ciclos con 15 pruebas nuevas (11 convencionales, 2 con mocks y 2 co
 | Integración | Ejecución de Jenkins | Historias | Commits (sin las uniones) | Commits por integrante | Pruebas | Resultado |
 |---|---|---|---|---|---|---|
 | 1 | #2 (8 de noviembre de 2026, 19:50) | HU-24 y HU-23 | 25 | Joel Places 16 · Lenin Jerez 3 · Dylan Maldonado 2 · Jeimy Sánchez 2 · Francisco Villalba 2 | 80 | SUCCESS |
-| 2 | #3 | HU-22 | | | 89 | |
+| 2 | #3 (8 de noviembre de 2026, 20:16) | HU-22 | 20 | Joel Places 12 · Lenin Jerez 2 · Dylan Maldonado 2 · Jeimy Sánchez 2 · Francisco Villalba 2 | 89 | SUCCESS |
 
 **Pruebas de aceptación.** `pruebas/casos-iteracion-5.js` comprueba en el navegador los escenarios de las historias, con una captura por escenario. Usa los datos de ejemplo, que se cargan al iniciar el contenedor con `DATOS_DEMO=true`:
 
 ```bash
-docker run -d --name encuentraepn -p 8080:8080 -e DATOS_DEMO=true <imagen>
+docker run -d --name encuentraepn -p 8080:8080 -e DATOS_DEMO=true joelalexanderp/encuentraepn:2.0
 cd pruebas
 npm install puppeteer-core
 node casos-iteracion-5.js capturas http://localhost:8080
 ```
 
 Los datos de ejemplo son dos usuarios (Bruno Salas, `bruno.salas@epn.edu.ec`, y Andrea Paz, `andrea.paz@epn.edu.ec`) y siete reportes de Bruno publicados hace entre 5 y 90 días; uno de ellos, la mochila, está reservado para Andrea.
+
+Resultado con la imagen descargada de Docker Hub (`joelalexanderp/encuentraepn:2.0`) el 8 de noviembre de 2026. Las capturas y los resultados están en [`docs/iteracion-5/aceptacion`](docs/iteracion-5/aceptacion):
+
+| Historia | Escenario | Resultado | Captura |
+|---|---|---|---|
+| HU-24 | 1. Ver un reporte reciente | Se cumple | [hu24-e1](docs/iteracion-5/aceptacion/hu24-e1-reporte-reciente.png) |
+| HU-24 | 2. No ver un reporte antiguo | Se cumple | [hu24-e1](docs/iteracion-5/aceptacion/hu24-e1-reporte-reciente.png) |
+| HU-24 | 3. Buscar un objeto con reporte antiguo | Se cumple | [hu24-e3](docs/iteracion-5/aceptacion/hu24-e3-busqueda-sin-resultados.png) |
+| HU-23 | 1. Saber que el reporte está por vencer | Se cumple | [hu23-e1](docs/iteracion-5/aceptacion/hu23-e1-por-vencer.png) |
+| HU-23 | 2. Renovar un reporte vencido | Se cumple | [hu23-e2](docs/iteracion-5/aceptacion/hu23-e2-de-nuevo-en-el-mapa.png) |
+| HU-23 | 3. No renovar un reporte reservado | Se cumple | [hu23-e3](docs/iteracion-5/aceptacion/hu23-e3-reservado-sin-renovar.png) |
+| HU-22 | 1. Corregir la descripción | Se cumple | [hu22-e1](docs/iteracion-5/aceptacion/hu22-e1-descripcion-corregida.png) |
+| HU-22 | 2. Corregir el lugar | Se cumple | [hu22-e2](docs/iteracion-5/aceptacion/hu22-e2-lugar-corregido.png) |
+| HU-22 | 3. Corregir la categoría | Se cumple | [hu22-e3](docs/iteracion-5/aceptacion/hu22-e3-filtro-electronicos.png) |
+| HU-22 | 4. No corregir un reporte reservado | Se cumple | [hu22-e4](docs/iteracion-5/aceptacion/hu22-e4-reservado-sin-corregir.png) |
+
+Con la misma imagen también pasan, como pruebas de regresión, los casos del flujo básico, los 9 escenarios del Incremento 4 y los 24 del Release 2.
 
 ## Release 2 (Examen 1B)
 
@@ -150,6 +167,8 @@ src/test/java/        pruebas unitarias (JUnit 5 y Mockito)
 docs/modelos/         diagramas de clases y de secuencia del diseño
 docs/release-2.md     plan del Release 2 con la trazabilidad de cada tarea a su commit
 docs/historias/       historias de usuario del Incremento 4: tarjeta, criterios, tareas y pruebas de aceptación
+docs/integraciones/   log de Jenkins de cada integración de la iteración 5
+docs/iteracion-5/     resultados y capturas de las pruebas de aceptación de la iteración 5
 pruebas/              casos de prueba automatizados en el navegador (CP-01A a CP-08, Release 2 e iteración 5)
 jenkins/              imagen de Jenkins del grupo: plugins y configuración como código
 Dockerfile            imagen de la aplicación (Tomcat 10.1 con el WAR)
@@ -158,22 +177,20 @@ Jenkinsfile           pipeline de integración continua
 
 ## Despliegue con Docker
 
-Solo se necesita Docker. La imagen publicada en Docker Hub, [joelalexanderp/encuentraepn:1.0](https://hub.docker.com/r/joelalexanderp/encuentraepn), es la de la Prueba 1 (sin el Release 2). Para ejecutar esta versión, se construye la imagen desde el código:
+Solo se necesita Docker. La imagen de esta versión está publicada en Docker Hub, [joelalexanderp/encuentraepn:2.0](https://hub.docker.com/r/joelalexanderp/encuentraepn), para `linux/amd64` y `linux/arm64`:
 
 ```bash
-docker build -t encuentraepn-release2 .
-docker run -d --name encuentraepn -p 8080:8080 encuentraepn-release2
+docker run -d --name encuentraepn -p 8080:8080 joelalexanderp/encuentraepn:2.0
 ```
 
-Luego abrir <http://localhost:8080/>. La aplicación arranca con la base de datos vacía (solo con las categorías y los puntos de entrega). Para conservar los datos aunque se borre el contenedor, agregar un volumen: `-v encuentraepn-datos:/root/gr05_1bpy`. Para detener y borrar el contenedor: `docker rm -f encuentraepn`.
+Luego abrir <http://localhost:8080/>. La aplicación arranca con la base de datos vacía (solo con las categorías y los puntos de entrega). Para demostrar los escenarios de la iteración 5, iniciar el contenedor con los datos de ejemplo: `-e DATOS_DEMO=true`. Para construir la imagen desde el código: `docker build -t encuentraepn .` Para conservar los datos aunque se borre el contenedor, agregar un volumen: `-v encuentraepn-datos:/root/gr05_1bpy`. Para detener y borrar el contenedor: `docker rm -f encuentraepn`.
 
 ## Integración continua con Jenkins en Docker
 
-La carpeta `jenkins` construye la imagen de Jenkins del grupo: la oficial `jenkins/jenkins:lts-jdk21` con los plugins (`jenkins/plugins.txt`) y la configuración como código (`jenkins/casc.yaml`): el usuario `admin` y la tarea Pipeline `GR05_1BPY_622_26B`, que toma el `Jenkinsfile` de la rama `main` de este repositorio. No necesita credenciales porque el repositorio es público. La imagen publicada [joelalexanderp/gr05-jenkins:1.0](https://hub.docker.com/r/joelalexanderp/gr05-jenkins) apunta al repositorio de la Prueba 1; para este repositorio se construye así:
+La carpeta `jenkins` construye la imagen de Jenkins del grupo: la oficial `jenkins/jenkins:lts-jdk21` con los plugins (`jenkins/plugins.txt`) y la configuración como código (`jenkins/casc.yaml`): el usuario `admin` y la tarea Pipeline `GR05_1BPY_622_26B`, que toma el `Jenkinsfile` de la rama `main` de este repositorio. No necesita credenciales porque el repositorio es público. La imagen está publicada en Docker Hub, [joelalexanderp/gr05-jenkins:2.0](https://hub.docker.com/r/joelalexanderp/gr05-jenkins), para `linux/amd64` y `linux/arm64`:
 
 ```bash
-docker build -t gr05-jenkins-release2 jenkins
-docker run -d --name jenkins-gr05 -p 8090:8080 -v jenkins-gr05-release2:/var/jenkins_home -e JENKINS_ADMIN_PASSWORD=<clave> gr05-jenkins-release2
+docker run -d --name jenkins-gr05 -p 8090:8080 -v jenkins-gr05-home:/var/jenkins_home -e JENKINS_ADMIN_PASSWORD=<clave> joelalexanderp/gr05-jenkins:2.0
 ```
 
 Luego abrir <http://localhost:8090/>. El pipeline revisa el repositorio cada 2 minutos y, si hay commits nuevos, ejecuta las etapas **Compilación**, **Pruebas unitarias** (con el reporte de JUnit) y **Empaquetado** (el WAR queda como artefacto).

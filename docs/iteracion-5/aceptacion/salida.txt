@@ -1,0 +1,18 @@
+
+HU-24 Ver solo los reportes vigentes
+  ok    escenario 1: El miembro ve en el mapa las llaves que se publicaron hace una semana
+  ok    escenario 2: El miembro no ve en el mapa la chaqueta que se publicó hace tres meses y no se renovó
+  ok    escenario 3: Al buscar «chaqueta», el miembro ve que ningún reporte coincide con su búsqueda
+
+HU-23 Renovar mi reporte
+  ok    escenario 1: El reportante ve que a su calculadora, publicada hace 55 días, le quedan pocos días para vencer
+  ok    escenario 2: Tras renovar sus audífonos, cuyo reporte había vencido, el reportante los vuelve a ver en el mapa
+  ok    escenario 3: El reportante no puede renovar la mochila, porque ya aceptó la reclamación de su dueño
+
+HU-22 Corregir mi reporte
+  ok    escenario 1: Tras corregir la descripción, el reportante ve su reporte con el llavero azul
+  ok    escenario 2: Tras corregir el lugar, el reportante ve su cuaderno en el lugar correcto del mapa (zona Norte)
+  ok    escenario 3: Tras cambiarlo a «Electrónicos», el reportante ve su cargador al filtrar el mapa por esa categoría
+  ok    escenario 4: El reportante no puede corregir la mochila, porque ya aceptó la reclamación de su dueño
+
+TODOS LOS ESCENARIOS SE CUMPLEN
