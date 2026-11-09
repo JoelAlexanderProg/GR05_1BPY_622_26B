@@ -27,9 +27,9 @@ import java.util.UUID;
 /**
  * CU-01 Registrar objeto perdido o encontrado.
  * Diagrama de clases: «control» ControlRegistroReporte. Vista: formularioReporte.jsp («boundary» FormularioReporte).
- * Diagrama de secuencia: SEC-01. También permite a su autor retirar un reporte (HU-11).
+ * Diagrama de secuencia: SEC-01. También permite a su autor retirar un reporte (HU-11) y renovarlo (HU-23).
  */
-@WebServlet({"/reportes/nuevo", "/reportes/retirar"})
+@WebServlet({"/reportes/nuevo", "/reportes/retirar", "/reportes/renovar"})
 public class ControlRegistroReporte extends ControlBase {
 
     /** Motivo con el que se rechazan las reclamaciones pendientes de un reporte retirado (HU-11). */
@@ -95,6 +95,16 @@ public class ControlRegistroReporte extends ControlBase {
             redirigir(request, response, "/inicio?retirado");
             return;
         }
+        if ("/reportes/renovar".equals(request.getServletPath())) {
+            // HU-23: renovarReporte(actor, id); la regla de la entidad se muestra como error
+            try {
+                renovarReporte(actorIdentificado(request), leerId(request, "id"));
+            } catch (IllegalStateException e) {
+                throw new OperacionInvalidaException("Solo se puede renovar un reporte activo.");
+            }
+            redirigir(request, response, "/inicio?renovado");
+            return;
+        }
         // SEC-01 · 3: solicitarPublicacion(datos)
         DatosReporte datos = leerDatos(request);
         UUID perdidoId = leerIdOpcional(request.getParameter(PARAMETRO_PERDIDO));
@@ -158,8 +168,8 @@ public class ControlRegistroReporte extends ControlBase {
             vincular(reporte, buscarPerdido(perdidoId));
         }
 
-        // SEC-01 · 10-11: publicar() → reporte ACTIVO
-        reporte.publicar();
+        // SEC-01 · 10-11: publicar() → reporte ACTIVO; HU-24: su vigencia empieza hoy
+        reporte.publicar(LocalDate.now());
 
         // Nota de SEC-01: el registro conserva el reporte y sus preguntas
         reporteDAO.guardar(reporte);
@@ -197,6 +207,18 @@ public class ControlRegistroReporte extends ControlBase {
             reclamacion.rechazar(MOTIVO_RETIRO);
         }
         // El retiro y los rechazos se guardan en una sola transacción
+        reporteDAO.actualizar(reporte);
+    }
+
+    /**
+     * HU-23: quien registró el reporte lo renueva y vuelve a aparecer en el mapa desde hoy.
+     */
+    public void renovarReporte(Usuario actor, UUID reporteId) {
+        Reporte reporte = reporteDAO.buscarPorId(reporteId);
+        if (reporte == null || !reporte.esAutor(actor)) {
+            throw new OperacionInvalidaException("Solo quien registró el reporte puede renovarlo.");
+        }
+        reporte.renovar(LocalDate.now());
         reporteDAO.actualizar(reporte);
     }
 

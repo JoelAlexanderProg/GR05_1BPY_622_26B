@@ -14,7 +14,7 @@ import java.util.List;
 
 /**
  * Al iniciar la aplicación registra las categorías y, desde la HU-21, los puntos de entrega oficiales,
- * si todavía no existen.
+ * si todavía no existen. Desde la iteración 5, si se pide, también carga los datos de ejemplo ({@link DatosDemo}).
  * Al detenerla cierra la conexión con la base de datos.
  */
 @WebListener
@@ -44,6 +44,10 @@ public class InicializadorDatos implements ServletContextListener {
             PuntoEntregaDAO puntoEntregaDAO = new PuntoEntregaDAO();
             if (puntoEntregaDAO.listarTodos().isEmpty()) {
                 PUNTOS_ENTREGA.forEach(puntoEntregaDAO::guardar);
+            }
+            // Iteración 5: con DATOS_DEMO=true se cargan los reportes de ejemplo de los escenarios de aceptación
+            if (DatosDemo.activados()) {
+                new DatosDemo().cargarSiHaceFalta();
             }
         } finally {
             JPAUtil.cerrarEntityManager();

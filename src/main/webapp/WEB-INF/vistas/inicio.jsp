@@ -16,6 +16,9 @@
     <c:if test="${param.retirado != null}">
         <p class="exito" id="retirado">El reporte se retiró y ya no aparece en el mapa. Sus reclamaciones pendientes quedaron rechazadas.</p>
     </c:if>
+    <c:if test="${param.renovado != null}">
+        <p class="exito" id="renovado">El reporte se renovó y vuelve a aparecer en el mapa.</p>
+    </c:if>
     <c:choose>
         <c:when test="${empty misReportes}">
             <p class="vacio">Todavía no ha registrado reportes.</p>
@@ -23,7 +26,7 @@
         <c:otherwise>
             <table id="misReportes">
                 <thead>
-                <tr><th>Tipo</th><th>Descripción</th><th>Fecha</th><th>Estado</th><th></th></tr>
+                <tr><th>Tipo</th><th>Descripción</th><th>Fecha</th><th>Estado</th><th>En el mapa</th><th></th></tr>
                 </thead>
                 <tbody>
                 <c:forEach var="reporte" items="${misReportes}">
@@ -32,6 +35,25 @@
                         <td><c:out value="${reporte.descripcionPublica}"/></td>
                         <td>${reporte.fechaSuceso}</td>
                         <td>${reporte.estado.etiqueta}</td>
+                        <%-- HU-23: cuánto le queda al reporte para vencer; los reportes vencidos ya no se muestran en el mapa --%>
+                        <td class="vigencia">
+                            <c:choose>
+                                <c:when test="${not reporte.estaActivo()}">—</c:when>
+                                <c:when test="${not reporte.estaVigente(hoy)}">
+                                    <span class="vencido">Venció: ya no aparece en el mapa</span>
+                                </c:when>
+                                <c:when test="${reporte.estaPorVencer(hoy)}">
+                                    <c:set var="dias" value="${reporte.diasParaVencer(hoy)}"/>
+                                    <span class="por-vencer">Por vencer:
+                                        <c:choose>
+                                            <c:when test="${dias == 1}">le queda 1 día</c:when>
+                                            <c:otherwise>le quedan ${dias} días</c:otherwise>
+                                        </c:choose>
+                                    </span>
+                                </c:when>
+                                <c:otherwise>Vigente: ${reporte.diasParaVencer(hoy)} días más</c:otherwise>
+                            </c:choose>
+                        </td>
                         <td class="enlaces">
                             <a href="${ctx}/reportes/detalle?id=${reporte.id}">Detalle</a>
                             <c:if test="${reporte.esEncontrado()}">
@@ -40,6 +62,13 @@
                             <%-- HU-14: un objeto perdido activo puede tener objetos encontrados que coinciden --%>
                             <c:if test="${not reporte.esEncontrado() and reporte.estaActivo()}">
                                 <a href="${ctx}/coincidencias?reporte=${reporte.id}">Coincidencias</a>
+                            </c:if>
+                            <%-- HU-23: un reporte activo se renueva cuando está por vencer o ya venció --%>
+                            <c:if test="${reporte.estaActivo() and (reporte.estaPorVencer(hoy) or not reporte.estaVigente(hoy))}">
+                                <form method="post" action="${ctx}/reportes/renovar">
+                                    <input type="hidden" name="id" value="${reporte.id}">
+                                    <button type="submit" class="boton-enlace renovar">Renovar</button>
+                                </form>
                             </c:if>
                             <%-- HU-11: solo los reportes activos se pueden retirar --%>
                             <c:if test="${reporte.estaActivo()}">

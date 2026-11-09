@@ -36,6 +36,12 @@ public class Reporte {
     /** HU-14: días después de la pérdida en los que un hallazgo todavía puede ser el mismo objeto. */
     public static final int DIAS_COINCIDENCIA = 30;
 
+    /** HU-24: días que un reporte sigue vigente desde que se publicó o se renovó. */
+    public static final int DIAS_VIGENCIA = 60;
+
+    /** HU-23: últimos días de vigencia en los que se avisa al autor que su reporte está por vencer. */
+    public static final int DIAS_AVISO_VENCIMIENTO = 7;
+
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
@@ -55,6 +61,9 @@ public class Reporte {
     private EstadoReporte estado;
 
     private LocalDateTime fechaDevolucion;
+
+    /** HU-24: día desde el que cuenta la vigencia del reporte: su publicación o su última renovación. */
+    private LocalDate inicioVigencia;
 
     @ManyToOne(optional = false)
     private Usuario autor;
@@ -94,6 +103,23 @@ public class Reporte {
     // SEC-01 · 10: publicar()
     public void publicar() {
         cambiarEstado(EstadoReporte.BORRADOR, EstadoReporte.ACTIVO);
+    }
+
+    /**
+     * HU-24: publica el reporte el día indicado; desde ese día cuenta su vigencia.
+     */
+    public void publicar(LocalDate hoy) {
+        publicar();
+        inicioVigencia = hoy;
+    }
+
+    /**
+     * HU-23: quien publicó el reporte lo renueva y vuelve a estar vigente desde ese día.
+     * Solo se renueva un reporte activo; si está reservado o retirado, lanza IllegalStateException.
+     */
+    public void renovar(LocalDate hoy) {
+        exigirEstado(EstadoReporte.ACTIVO);
+        inicioVigencia = hoy;
     }
 
     // SEC-04 · 18: reservar()
@@ -214,12 +240,42 @@ public class Reporte {
         }
     }
 
+    /**
+     * HU-24: el reporte sigue vigente durante {@value #DIAS_VIGENCIA} días desde que se publicó o se renovó.
+     */
+    public boolean estaVigente(LocalDate hoy) {
+        return diasParaVencer(hoy) > 0;
+    }
+
+    /**
+     * HU-24: el reporte se muestra en el mapa y en la búsqueda mientras está activo y vigente.
+     */
+    public boolean esVisibleEnMapa(LocalDate hoy) {
+        return estaActivo() && estaVigente(hoy);
+    }
+
     public boolean esEncontrado() {
         return tipo == TipoReporte.ENCONTRADO;
     }
 
+    /**
+     * HU-23: días que le quedan al reporte antes de vencer; 0 si ya venció.
+     */
+    public int diasParaVencer(LocalDate hoy) {
+        long transcurridos = hoy.toEpochDay() - inicioVigencia.toEpochDay();
+        return (int) Math.max(0, DIAS_VIGENCIA - transcurridos);
+    }
+
     public boolean estaActivo() {
         return estado == EstadoReporte.ACTIVO;
+    }
+
+    /**
+     * HU-23: el reporte está por vencer en sus últimos {@value #DIAS_AVISO_VENCIMIENTO} días de vigencia.
+     */
+    public boolean estaPorVencer(LocalDate hoy) {
+        int dias = diasParaVencer(hoy);
+        return dias > 0 && dias <= DIAS_AVISO_VENCIMIENTO;
     }
 
     public boolean esAutor(Usuario usuario) {
@@ -262,6 +318,10 @@ public class Reporte {
 
     public LocalDateTime getFechaDevolucion() {
         return fechaDevolucion;
+    }
+
+    public LocalDate getInicioVigencia() {
+        return inicioVigencia;
     }
 
     public Usuario getAutor() {
