@@ -36,6 +36,12 @@ public class Reporte {
     /** HU-14: días después de la pérdida en los que un hallazgo todavía puede ser el mismo objeto. */
     public static final int DIAS_COINCIDENCIA = 30;
 
+    /** HU-24: días que un reporte sigue vigente desde que se publicó o se renovó. */
+    public static final int DIAS_VIGENCIA = 60;
+
+    /** HU-23: últimos días de vigencia en los que se avisa al autor que su reporte está por vencer. */
+    public static final int DIAS_AVISO_VENCIMIENTO = 7;
+
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
@@ -217,10 +223,10 @@ public class Reporte {
     }
     
     /**
-     * HU-24: el reporte sigue vigente durante 60 días desde que se publicó o se renovó.
+     * HU-24: el reporte sigue vigente durante {@value #DIAS_VIGENCIA} días desde que se publicó o se renovó.
      */
     public boolean estaVigente(LocalDate hoy) {
-        return hoy.isBefore(inicioVigencia.plusDays(60));
+        return hoy.isBefore(inicioVigencia.plusDays(DIAS_VIGENCIA));
     }
 
     /**
@@ -239,7 +245,7 @@ public class Reporte {
      */
     public int diasParaVencer(LocalDate hoy) {
         long transcurridos = hoy.toEpochDay() - inicioVigencia.toEpochDay();
-        return (int) Math.max(0, 60 - transcurridos);
+        return (int) Math.max(0, DIAS_VIGENCIA - transcurridos);
     }
     
     public boolean estaActivo() {
@@ -247,11 +253,11 @@ public class Reporte {
     }
 
     /**
-     * HU-23: el reporte está por vencer en sus últimos 7 días de vigencia.
+     * HU-23: el reporte está por vencer en sus últimos {@value #DIAS_AVISO_VENCIMIENTO} días de vigencia.
      */
     public boolean estaPorVencer(LocalDate hoy) {
-        LocalDate vencimiento = inicioVigencia.plusDays(60);
-        return !hoy.isBefore(vencimiento.minusDays(7)) && hoy.isBefore(vencimiento);
+        LocalDate vencimiento = inicioVigencia.plusDays(DIAS_VIGENCIA);
+        return !hoy.isBefore(vencimiento.minusDays(DIAS_AVISO_VENCIMIENTO)) && hoy.isBefore(vencimiento);
     }
     public boolean esAutor(Usuario usuario) {
         return autor.equals(usuario);
