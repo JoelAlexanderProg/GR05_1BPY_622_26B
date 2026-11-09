@@ -13,17 +13,21 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
 import static ec.edu.epn.encuentraepn.DatosDePrueba.reclamacionPendiente;
+import static ec.edu.epn.encuentraepn.DatosDePrueba.reportePublicadoEl;
 import static ec.edu.epn.encuentraepn.controlador.ControlRegistroReporte.MOTIVO_RETIRO;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * HU-11 Retirar un reporte propio. Prueba del control con el acceso a datos simulado.
+ * HU-11 Retirar un reporte propio y HU-23 Renovar mi reporte. Pruebas del control con el acceso a datos simulado.
  */
 @ExtendWith(MockitoExtension.class)
 class ControlRegistroReporteTest {
@@ -52,5 +56,23 @@ class ControlRegistroReporteTest {
         assertEquals(EstadoReporte.RETIRADO, reporte.getEstado());
         assertEquals(EstadoReclamacion.RECHAZADA, pendiente.getEstado());
         assertEquals(MOTIVO_RETIRO, pendiente.getMotivoRechazo());
+    }
+
+    @Test
+    @DisplayName("HU-23: el control renueva el reporte solo si quien lo pide es su autor, y lo guarda con el DAO")
+    void renovarReporteSoloLoHaceSuAutorYLoGuarda() {
+        Reporte vencido = reportePublicadoEl(LocalDate.now().minusDays(90));
+        UUID id = UUID.randomUUID();
+        when(reporteDAO.buscarPorId(id)).thenReturn(vencido);
+        ControlRegistroReporte control = new ControlRegistroReporte(reporteDAO, reclamacionDAO);
+        Usuario otraPersona = new Usuario("Andrea Paz", "andrea.paz@epn.edu.ec");
+
+        assertThrows(OperacionInvalidaException.class, () -> control.renovarReporte(otraPersona, id));
+        verify(reporteDAO, never()).actualizar(vencido);
+
+        control.renovarReporte(vencido.getAutor(), id);
+
+        verify(reporteDAO).actualizar(vencido);
+        assertEquals(LocalDate.now(), vencido.getInicioVigencia());
     }
 }

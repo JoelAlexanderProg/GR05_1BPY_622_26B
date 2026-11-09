@@ -201,6 +201,12 @@ public class ControlRegistroReporte extends ControlBase {
     }
 
     /**
+     * HU-23: quien registró el reporte lo renueva y vuelve a aparecer en el mapa desde hoy.
+     */
+    public void renovarReporte(Usuario actor, UUID reporteId) {
+    }
+
+    /**
      * HU-15: reporte de pérdida sobre el que el actor quiere avisar que encontró el objeto.
      * Comprueba que siga activo y que no sea del propio actor.
      */
