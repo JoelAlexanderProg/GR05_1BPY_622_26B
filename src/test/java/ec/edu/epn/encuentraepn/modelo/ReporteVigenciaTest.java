@@ -7,7 +7,9 @@ import java.time.LocalDate;
 
 import static ec.edu.epn.encuentraepn.DatosDePrueba.reportePublicadoEl;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * HU-24 Ver solo los reportes vigentes y HU-23 Renovar mi reporte: reglas de la vigencia de un reporte.
@@ -38,5 +40,18 @@ class ReporteVigenciaTest {
         assertThrows(IllegalStateException.class, () -> retirado.renovar(renovacion));
         assertEquals(publicacion, reservado.getInicioVigencia());
         assertEquals(publicacion, retirado.getInicioVigencia());
+    }
+
+    @Test
+    @DisplayName("Un reporte activo pero vencido no se muestra en el mapa")
+    void unReporteActivoPeroVencidoNoSeMuestraEnElMapa() {
+        LocalDate publicacion = LocalDate.of(2026, 8, 10);
+        Reporte reporte = reportePublicadoEl(publicacion);
+        Reporte retirado = reportePublicadoEl(publicacion);
+        retirado.retirar();
+
+        assertTrue(reporte.esVisibleEnMapa(publicacion.plusDays(7)), "activo y vigente: se muestra");
+        assertFalse(reporte.esVisibleEnMapa(publicacion.plusDays(90)), "activo pero vencido: no se muestra");
+        assertFalse(retirado.esVisibleEnMapa(publicacion.plusDays(7)), "vigente pero retirado: no se muestra");
     }
 }

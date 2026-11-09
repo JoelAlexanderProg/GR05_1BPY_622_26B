@@ -223,6 +223,13 @@ public class Reporte {
         return hoy.isBefore(inicioVigencia.plusDays(60));
     }
 
+    /**
+     * HU-24: el reporte se muestra en el mapa y en la búsqueda.
+     */
+    public boolean esVisibleEnMapa(LocalDate hoy) {
+        return false;
+    }
+
     public boolean esEncontrado() {
         return tipo == TipoReporte.ENCONTRADO;
     }
