@@ -310,6 +310,11 @@ td.enlaces form {
     color: #1d5fa8;
 }
 
+/* HU-23: con la columna de vigencia, la fecha de «Mis reportes» no se parte en dos líneas */
+#misReportes td:nth-child(3) {
+    white-space: nowrap;
+}
+
 /* HU-23: vigencia de los reportes en «Mis reportes» */
 td.vigencia .por-vencer {
     color: #8a5300;
