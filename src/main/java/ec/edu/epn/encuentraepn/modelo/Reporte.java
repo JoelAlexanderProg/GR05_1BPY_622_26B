@@ -221,12 +221,12 @@ public class Reporte {
             throw new IllegalStateException("El reporte debe estar en estado " + esperado + " y está " + estado);
         }
     }
-    
+
     /**
      * HU-24: el reporte sigue vigente durante {@value #DIAS_VIGENCIA} días desde que se publicó o se renovó.
      */
     public boolean estaVigente(LocalDate hoy) {
-        return hoy.isBefore(inicioVigencia.plusDays(DIAS_VIGENCIA));
+        return diasParaVencer(hoy) > 0;
     }
 
     /**
@@ -247,7 +247,7 @@ public class Reporte {
         long transcurridos = hoy.toEpochDay() - inicioVigencia.toEpochDay();
         return (int) Math.max(0, DIAS_VIGENCIA - transcurridos);
     }
-    
+
     public boolean estaActivo() {
         return estado == EstadoReporte.ACTIVO;
     }
@@ -256,9 +256,10 @@ public class Reporte {
      * HU-23: el reporte está por vencer en sus últimos {@value #DIAS_AVISO_VENCIMIENTO} días de vigencia.
      */
     public boolean estaPorVencer(LocalDate hoy) {
-        LocalDate vencimiento = inicioVigencia.plusDays(DIAS_VIGENCIA);
-        return !hoy.isBefore(vencimiento.minusDays(DIAS_AVISO_VENCIMIENTO)) && hoy.isBefore(vencimiento);
+        int dias = diasParaVencer(hoy);
+        return dias > 0 && dias <= DIAS_AVISO_VENCIMIENTO;
     }
+
     public boolean esAutor(Usuario usuario) {
         return autor.equals(usuario);
     }
