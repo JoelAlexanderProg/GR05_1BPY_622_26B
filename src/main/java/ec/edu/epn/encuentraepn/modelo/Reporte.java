@@ -206,6 +206,13 @@ public class Reporte {
             throw new IllegalStateException("El reporte debe estar en estado " + esperado + " y está " + estado);
         }
     }
+    
+    /**
+     * HU-24: el reporte sigue vigente durante 60 días desde que se publicó o se renovó.
+     */
+    public boolean estaVigente(LocalDate hoy) {
+        return hoy.isBefore(inicioVigencia.plusDays(60));
+    }
 
     public boolean esEncontrado() {
         return tipo == TipoReporte.ENCONTRADO;
