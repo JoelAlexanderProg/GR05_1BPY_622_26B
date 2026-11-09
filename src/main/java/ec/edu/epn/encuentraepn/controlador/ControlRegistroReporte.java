@@ -227,6 +227,31 @@ public class ControlRegistroReporte extends ControlBase {
      * HU-22: quien registró el reporte corrige su descripción, su categoría y su lugar.
      */
     public void corregirReporte(Usuario actor, UUID reporteId, DatosCorreccion datos) {
+        Reporte reporte = reporteDAO.buscarPorId(reporteId);
+        if (reporte == null || !reporte.esAutor(actor)) {
+            throw new OperacionInvalidaException("Solo quien registró el reporte puede corregirlo.");
+        }
+        Categoria categoria = categoriaDAO.buscarPorId(datos.categoriaId());
+        if (categoria == null) {
+            throw new OperacionInvalidaException("Seleccione una categoría.");
+        }
+        if (datos.latitud() == null || datos.longitud() == null) {
+            throw new OperacionInvalidaException("Marque la ubicación en el mapa.");
+        }
+        Ubicacion ubicacion = new Ubicacion(datos.latitud(), datos.longitud(),
+                Campus.zonaDe(datos.latitud(), datos.longitud()));
+        if (!ubicacion.estaDentroDelCampus()) {
+            throw new OperacionInvalidaException("La ubicación debe estar dentro del campus.");
+        }
+        // Se valida todo antes de cambiar el reporte, para que una corrección inválida no lo deje a medias
+        try {
+            reporte.corregirDescripcion(datos.descripcionPublica());
+        } catch (IllegalArgumentException e) {
+            throw new OperacionInvalidaException(e.getMessage());
+        }
+        reporte.corregirUbicacion(ubicacion);
+        reporte.corregirCategoria(categoria);
+        reporteDAO.actualizar(reporte);
     }
 
     /**
