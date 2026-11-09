@@ -26,6 +26,7 @@ Proyecto del primer bimestre de Metodologías Ágiles (ISWD622, EPN, 2026-B), Gr
 | R2 · It. 2 | HU-21 Elegir un punto de entrega oficial del campus | `ControlDevoluciones` | `panelDevolucion.jsp`, `vistaAcuerdoEntrega.jsp` |
 | R3 · It. 5 | HU-24 Ver solo los reportes vigentes | `ControlConsultaReportes` | `mapaReportes.jsp` |
 | R3 · It. 5 | HU-23 Renovar mi reporte | `ControlRegistroReporte`, `ControlInicio` | `inicio.jsp` |
+| R3 · It. 5 | HU-22 Corregir mi reporte | `ControlRegistroReporte` | `formularioCorreccion.jsp`, `inicio.jsp` |
 
 ## Iteración 5 (Proyecto 1B)
 
@@ -35,7 +36,7 @@ Proyecto del primer bimestre de Metodologías Ágiles (ISWD622, EPN, 2026-B), Gr
 |---|---|---|---|
 | HU-24 Ver solo los reportes vigentes | Alta | 5,5 | Un reporte deja de mostrarse en el mapa y en la búsqueda 60 días después de publicarse, si nadie lo renueva |
 | HU-23 Renovar mi reporte | Alta | 7,5 | En «Mis reportes», el autor ve cuánto le queda a cada reporte y renueva el que está por vencer (últimos 7 días) o ya venció. Un reporte reservado o retirado no se renueva |
-| HU-22 Corregir mi reporte | Media | 8,5 | En desarrollo (integración 2) |
+| HU-22 Corregir mi reporte | Media | 8,5 | En «Mis reportes», el autor corrige la descripción, la categoría o el lugar de un reporte activo. Un reporte reservado no se corrige |
 
 Las historias son de la épica E8 («Como miembro de la comunidad EPN, quiero que los reportes del mapa estén al día para buscar solo objetos que todavía se pueden recuperar»).
 
@@ -51,13 +52,29 @@ Las historias son de la épica E8 («Como miembro de la comunidad EPN, quiero qu
 | TDD-06 | HU-23 | Convencional | `ReporteVigenciaTest`: un reporte reservado o retirado no se puede renovar |
 | TDD-07 | HU-24 | Convencional | `ReporteVigenciaTest`: un reporte activo pero vencido no se muestra en el mapa |
 | TDD-08 | HU-23 | Con mocks (Mockito) | `ControlRegistroReporteTest`: el control renueva solo si quien lo pide es el autor, y guarda con el DAO |
+| TDD-09 | HU-22 | Convencional y con parámetros | `ReporteCorreccionDescripcionTest`: corregir la descripción la reemplaza; una vacía, en blanco o de más de 200 caracteres se rechaza |
+| TDD-10 | HU-22 | Convencional | `ReporteCorreccionLugarTest`: corregir el lugar mueve el reporte al nuevo punto del campus |
+| TDD-11 | HU-22 | Convencional | `ReporteCorreccionCategoriaTest`: corregir la categoría la reemplaza por la nueva |
+| TDD-12 | HU-22 | Convencional | `ReporteSePuedeCorregirTest`: solo un reporte activo se puede corregir |
+| TDD-13 | HU-22 | Convencional | `ReporteCorreccionTest`: las correcciones no se aplican a un reporte reservado |
+| TDD-14 | HU-22 | Con mocks (Mockito) | `ControlRegistroReporteTest`: el control corrige solo si quien lo pide es el autor y el lugar está en el campus, y guarda con el DAO |
 
 | Refactorización | Técnica | Qué cambia |
 |---|---|---|
 | R1 | Replace Magic Literal | Los 60 y 7 días pasan a las constantes `DIAS_VIGENCIA` y `DIAS_AVISO_VENCIMIENTO` |
 | R2 | Substitute Algorithm | `estaVigente` y `estaPorVencer` usan `diasParaVencer`, sin repetir el cálculo de la fecha de vencimiento |
+| R3 | Extract Method | Las tres correcciones comprueban que el reporte se puede corregir con `exigirQueSePuedaCorregir` |
+| R4 | Replace Magic Literal | El largo máximo de la descripción, repetido en la entidad y en el control, pasa a `Reporte.MAX_DESCRIPCION` |
+| R5 | Extract Method | `retirarReporte`, `renovarReporte` y `corregirReporte` comprueban que el actor es el autor con `exigirAutor` |
 
-**Integración continua.** Los ciclos de cada integración llegan por pull request a la rama `integracion-N`. Allí se unen, se ejecutan todas las pruebas (build privado) y se integran en `main` con un solo push, que Jenkins construye.
+En total: 14 ciclos con 15 pruebas nuevas (11 convencionales, 2 con mocks y 2 con parámetros) y 5 refactorizaciones. Con las anteriores, el proyecto tiene 89 pruebas unitarias.
+
+**Integración continua.** Los ciclos de cada integración llegan por pull request a la rama `integracion-N`. Allí se unen, se ejecutan todas las pruebas (build privado) y se integran en `main` con un solo push, que Jenkins construye. El log de cada ejecución está en [`docs/integraciones`](docs/integraciones).
+
+| Integración | Ejecución de Jenkins | Historias | Commits (sin las uniones) | Commits por integrante | Pruebas | Resultado |
+|---|---|---|---|---|---|---|
+| 1 | #2 (8 de noviembre de 2026, 19:50) | HU-24 y HU-23 | 25 | Joel Places 16 · Lenin Jerez 3 · Dylan Maldonado 2 · Jeimy Sánchez 2 · Francisco Villalba 2 | 80 | SUCCESS |
+| 2 | #3 | HU-22 | | | 89 | |
 
 **Pruebas de aceptación.** `pruebas/casos-iteracion-5.js` comprueba en el navegador los escenarios de las historias, con una captura por escenario. Usa los datos de ejemplo, que se cargan al iniciar el contenedor con `DATOS_DEMO=true`:
 
@@ -68,7 +85,7 @@ npm install puppeteer-core
 node casos-iteracion-5.js capturas http://localhost:8080
 ```
 
-Los datos de ejemplo son dos usuarios (Bruno Salas, `bruno.salas@epn.edu.ec`, y Andrea Paz, `andrea.paz@epn.edu.ec`) y cinco reportes de Bruno publicados hace 7, 55, 58, 70 y 90 días; el de hace 58 días está reservado para Andrea.
+Los datos de ejemplo son dos usuarios (Bruno Salas, `bruno.salas@epn.edu.ec`, y Andrea Paz, `andrea.paz@epn.edu.ec`) y siete reportes de Bruno publicados hace entre 5 y 90 días; uno de ellos, la mochila, está reservado para Andrea.
 
 ## Release 2 (Examen 1B)
 
