@@ -131,6 +131,9 @@ public class Reporte {
      * HU-22: quien publicó el reporte corrige su descripción. No puede quedar vacía ni pasar de 200 caracteres.
      */
     public void corregirDescripcion(String nueva) {
+        if (!sePuedeCorregir()) {
+            throw new IllegalStateException("Solo se puede corregir un reporte activo.");
+        }
         String descripcion = nueva.trim();
         if (descripcion.isEmpty() || descripcion.length() > 200) {
             throw new IllegalArgumentException("Escriba una descripción de hasta 200 caracteres.");
@@ -202,6 +205,9 @@ public class Reporte {
      * HU-22: quien publicó el reporte corrige el lugar donde perdió o encontró el objeto.
      */
     public void corregirUbicacion(Ubicacion nueva) {
+        if (!sePuedeCorregir()) {
+            throw new IllegalStateException("Solo se puede corregir un reporte activo.");
+        }
         ubicacion = nueva;
     }
     
@@ -286,6 +292,9 @@ public class Reporte {
      * HU-22: quien publicó el reporte corrige la categoría del objeto.
      */
     public void corregirCategoria(Categoria nueva) {
+        if (!sePuedeCorregir()) {
+            throw new IllegalStateException("Solo se puede corregir un reporte activo.");
+        }
         categoria = nueva;
     }
 
