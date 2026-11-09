@@ -204,6 +204,12 @@ public class ControlRegistroReporte extends ControlBase {
      * HU-23: quien registró el reporte lo renueva y vuelve a aparecer en el mapa desde hoy.
      */
     public void renovarReporte(Usuario actor, UUID reporteId) {
+        Reporte reporte = reporteDAO.buscarPorId(reporteId);
+        if (reporte == null || !reporte.esAutor(actor)) {
+            throw new OperacionInvalidaException("Solo quien registró el reporte puede renovarlo.");
+        }
+        reporte.renovar(LocalDate.now());
+        reporteDAO.actualizar(reporte);
     }
 
     /**
