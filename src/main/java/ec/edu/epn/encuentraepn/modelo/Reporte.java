@@ -237,6 +237,13 @@ public class Reporte {
         return estado == EstadoReporte.ACTIVO;
     }
 
+    /**
+     * HU-23: el reporte está por vencer en sus últimos 7 días de vigencia.
+     */
+    public boolean estaPorVencer(LocalDate hoy) {
+        LocalDate vencimiento = inicioVigencia.plusDays(60);
+        return !hoy.isBefore(vencimiento.minusDays(7)) && hoy.isBefore(vencimiento);
+    }
     public boolean esAutor(Usuario usuario) {
         return autor.equals(usuario);
     }
