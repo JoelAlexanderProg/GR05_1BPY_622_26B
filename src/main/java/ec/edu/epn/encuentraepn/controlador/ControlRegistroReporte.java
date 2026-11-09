@@ -199,10 +199,7 @@ public class ControlRegistroReporte extends ControlBase {
      * HU-11: quien registró el reporte lo retira. Sus reclamaciones pendientes quedan rechazadas.
      */
     public void retirarReporte(Usuario actor, UUID reporteId) {
-        Reporte reporte = reporteDAO.buscarPorId(reporteId);
-        if (reporte == null || !reporte.esAutor(actor)) {
-            throw new OperacionInvalidaException("Solo quien registró el reporte puede retirarlo.");
-        }
+        Reporte reporte = exigirAutor(actor, reporteId, "retirarlo");
         reporte.retirar();
         for (Reclamacion reclamacion : reclamacionDAO.listarPendientes(reporte)) {
             reclamacion.rechazar(MOTIVO_RETIRO);
@@ -215,10 +212,7 @@ public class ControlRegistroReporte extends ControlBase {
      * HU-23: quien registró el reporte lo renueva y vuelve a aparecer en el mapa desde hoy.
      */
     public void renovarReporte(Usuario actor, UUID reporteId) {
-        Reporte reporte = reporteDAO.buscarPorId(reporteId);
-        if (reporte == null || !reporte.esAutor(actor)) {
-            throw new OperacionInvalidaException("Solo quien registró el reporte puede renovarlo.");
-        }
+        Reporte reporte = exigirAutor(actor, reporteId, "renovarlo");
         reporte.renovar(LocalDate.now());
         reporteDAO.actualizar(reporte);
     }
@@ -227,10 +221,7 @@ public class ControlRegistroReporte extends ControlBase {
      * HU-22: quien registró el reporte corrige su descripción, su categoría y su lugar.
      */
     public void corregirReporte(Usuario actor, UUID reporteId, DatosCorreccion datos) {
-        Reporte reporte = reporteDAO.buscarPorId(reporteId);
-        if (reporte == null || !reporte.esAutor(actor)) {
-            throw new OperacionInvalidaException("Solo quien registró el reporte puede corregirlo.");
-        }
+        Reporte reporte = exigirAutor(actor, reporteId, "corregirlo");
         Categoria categoria = categoriaDAO.buscarPorId(datos.categoriaId());
         if (categoria == null) {
             throw new OperacionInvalidaException("Seleccione una categoría.");
@@ -243,7 +234,7 @@ public class ControlRegistroReporte extends ControlBase {
         if (!ubicacion.estaDentroDelCampus()) {
             throw new OperacionInvalidaException("La ubicación debe estar dentro del campus.");
         }
-        // Se valida todo antes de cambiar el reporte, para que una corrección inválida no lo deje a medias
+        // La categoría y el lugar se validan antes de cambiar el reporte, para que una corrección inválida no lo deje a medias
         try {
             reporte.corregirDescripcion(datos.descripcionPublica());
         } catch (IllegalArgumentException e) {
@@ -252,6 +243,18 @@ public class ControlRegistroReporte extends ControlBase {
         reporte.corregirUbicacion(ubicacion);
         reporte.corregirCategoria(categoria);
         reporteDAO.actualizar(reporte);
+    }
+
+    /**
+     * HU-11, HU-22 y HU-23: el reporte indicado, si quien lo pide es su autor. Si no existe o es de otra persona,
+     * lanza OperacionInvalidaException con la acción que no se puede hacer (por ejemplo, «retirarlo»).
+     */
+    private Reporte exigirAutor(Usuario actor, UUID reporteId, String accion) {
+        Reporte reporte = reporteDAO.buscarPorId(reporteId);
+        if (reporte == null || !reporte.esAutor(actor)) {
+            throw new OperacionInvalidaException("Solo quien registró el reporte puede " + accion + ".");
+        }
+        return reporte;
     }
 
     /**
