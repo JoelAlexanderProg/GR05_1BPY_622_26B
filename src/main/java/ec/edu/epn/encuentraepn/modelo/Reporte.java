@@ -205,7 +205,7 @@ public class Reporte {
         if (estado != esperado) {
             throw new IllegalStateException("El reporte debe estar en estado " + esperado + " y está " + estado);
         }
-
+    }
     
     /**
      * HU-24: el reporte sigue vigente durante 60 días desde que se publicó o se renovó.
