@@ -226,6 +226,13 @@ public class Reporte {
         return autor.equals(usuario);
     }
 
+    /**
+     * HU-22: quien publicó el reporte corrige la categoría del objeto.
+     */
+    public void corregirCategoria(Categoria nueva) {
+        categoria = nueva;
+    }
+
     public UUID getId() {
         return id;
     }
