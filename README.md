@@ -2,7 +2,7 @@
 
 Sistema web georreferenciado de objetos perdidos y encontrados en el campus de la Escuela Politécnica Nacional.
 
-Examen del primer bimestre de Metodologías Ágiles (ISWD622, EPN, 2026-B), Grupo 5: plan de un release con dos iteraciones de una semana y su implementación. El punto de partida es la aplicación de la Prueba 1 ([GR05_1BPR1_622_26B](https://github.com/JoelAlexanderProg/GR05_1BPR1_622_26B), Incremento 4).
+Proyecto del primer bimestre de Metodologías Ágiles (ISWD622, EPN, 2026-B), Grupo 5: una iteración de Programación Extrema con funcionalidades nuevas, desarrollada con TDD e integración continua. El punto de partida es la aplicación del Examen 1B ([GR05_1BEX_622_26B](https://github.com/JoelAlexanderProg/GR05_1BEX_622_26B), Release 2: HU-01 a HU-21).
 
 ## Casos de uso implementados
 
@@ -24,6 +24,51 @@ Examen del primer bimestre de Metodologías Ágiles (ISWD622, EPN, 2026-B), Grup
 | R2 · It. 2 | HU-19 Cancelar una entrega que no se realizó | `ControlDevoluciones` | `panelDevolucion.jsp`, `inicio.jsp` |
 | R2 · It. 2 | HU-20 Pedir otra fecha para la entrega | `ControlDevoluciones` | `vistaAcuerdoEntrega.jsp`, `panelDevolucion.jsp` |
 | R2 · It. 2 | HU-21 Elegir un punto de entrega oficial del campus | `ControlDevoluciones` | `panelDevolucion.jsp`, `vistaAcuerdoEntrega.jsp` |
+| R3 · It. 5 | HU-24 Ver solo los reportes vigentes | `ControlConsultaReportes` | `mapaReportes.jsp` |
+| R3 · It. 5 | HU-23 Renovar mi reporte | `ControlRegistroReporte`, `ControlInicio` | `inicio.jsp` |
+
+## Iteración 5 (Proyecto 1B)
+
+**Objetivo:** implementar la actualización de los reportes publicados en el mapa: su vencimiento, su renovación y su corrección por parte del autor.
+
+| Historia | Prioridad | Horas ideales | Qué hace |
+|---|---|---|---|
+| HU-24 Ver solo los reportes vigentes | Alta | 5,5 | Un reporte deja de mostrarse en el mapa y en la búsqueda 60 días después de publicarse, si nadie lo renueva |
+| HU-23 Renovar mi reporte | Alta | 7,5 | En «Mis reportes», el autor ve cuánto le queda a cada reporte y renueva el que está por vencer (últimos 7 días) o ya venció. Un reporte reservado o retirado no se renueva |
+| HU-22 Corregir mi reporte | Media | 8,5 | En desarrollo (integración 2) |
+
+Las historias son de la épica E8 («Como miembro de la comunidad EPN, quiero que los reportes del mapa estén al día para buscar solo objetos que todavía se pueden recuperar»).
+
+**TDD.** Cada ciclo tiene un commit `TDD-nn · Rojo` (la prueba falla) y otro `TDD-nn · Verde` (el código mínimo que la hace pasar). Las refactorizaciones van en su propio commit, con todas las pruebas en verde.
+
+| Ciclo | Historia | Tipo | Prueba |
+|---|---|---|---|
+| TDD-01 | HU-24 | Convencional | `ReporteVigenciaTest`: publicar un reporte inicia su vigencia ese mismo día |
+| TDD-02 | HU-24 | Con parámetros | `ReporteVigenteTest`: un reporte sigue vigente hasta 60 días después de publicarse (0, 59, 60 y 90 días) |
+| TDD-03 | HU-23 | Convencional | `ReporteDiasParaVencerTest`: cuántos días le quedan a un reporte antes de vencer |
+| TDD-04 | HU-23 | Convencional | `ReporteRenovacionTest`: renovar un reporte reinicia su vigencia desde ese día |
+| TDD-05 | HU-23 | Convencional | `ReportePorVencerTest`: un reporte está por vencer en sus últimos 7 días de vigencia |
+| TDD-06 | HU-23 | Convencional | `ReporteVigenciaTest`: un reporte reservado o retirado no se puede renovar |
+| TDD-07 | HU-24 | Convencional | `ReporteVigenciaTest`: un reporte activo pero vencido no se muestra en el mapa |
+| TDD-08 | HU-23 | Con mocks (Mockito) | `ControlRegistroReporteTest`: el control renueva solo si quien lo pide es el autor, y guarda con el DAO |
+
+| Refactorización | Técnica | Qué cambia |
+|---|---|---|
+| R1 | Replace Magic Literal | Los 60 y 7 días pasan a las constantes `DIAS_VIGENCIA` y `DIAS_AVISO_VENCIMIENTO` |
+| R2 | Substitute Algorithm | `estaVigente` y `estaPorVencer` usan `diasParaVencer`, sin repetir el cálculo de la fecha de vencimiento |
+
+**Integración continua.** Los ciclos de cada integración llegan por pull request a la rama `integracion-N`. Allí se unen, se ejecutan todas las pruebas (build privado) y se integran en `main` con un solo push, que Jenkins construye.
+
+**Pruebas de aceptación.** `pruebas/casos-iteracion-5.js` comprueba en el navegador los escenarios de las historias, con una captura por escenario. Usa los datos de ejemplo, que se cargan al iniciar el contenedor con `DATOS_DEMO=true`:
+
+```bash
+docker run -d --name encuentraepn -p 8080:8080 -e DATOS_DEMO=true <imagen>
+cd pruebas
+npm install puppeteer-core
+node casos-iteracion-5.js capturas http://localhost:8080
+```
+
+Los datos de ejemplo son dos usuarios (Bruno Salas, `bruno.salas@epn.edu.ec`, y Andrea Paz, `andrea.paz@epn.edu.ec`) y cinco reportes de Bruno publicados hace 7, 55, 58, 70 y 90 días; el de hace 58 días está reservado para Andrea.
 
 ## Release 2 (Examen 1B)
 
@@ -88,7 +133,7 @@ src/test/java/        pruebas unitarias (JUnit 5 y Mockito)
 docs/modelos/         diagramas de clases y de secuencia del diseño
 docs/release-2.md     plan del Release 2 con la trazabilidad de cada tarea a su commit
 docs/historias/       historias de usuario del Incremento 4: tarjeta, criterios, tareas y pruebas de aceptación
-pruebas/              casos de prueba automatizados en el navegador (CP-01A a CP-08 y Release 2)
+pruebas/              casos de prueba automatizados en el navegador (CP-01A a CP-08, Release 2 e iteración 5)
 jenkins/              imagen de Jenkins del grupo: plugins y configuración como código
 Dockerfile            imagen de la aplicación (Tomcat 10.1 con el WAR)
 Jenkinsfile           pipeline de integración continua
