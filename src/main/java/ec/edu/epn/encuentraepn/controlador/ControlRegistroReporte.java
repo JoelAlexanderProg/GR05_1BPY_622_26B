@@ -7,6 +7,7 @@ import ec.edu.epn.encuentraepn.dao.ReporteDAO;
 import ec.edu.epn.encuentraepn.modelo.Aviso;
 import ec.edu.epn.encuentraepn.modelo.Campus;
 import ec.edu.epn.encuentraepn.modelo.Categoria;
+import ec.edu.epn.encuentraepn.modelo.DatosCorreccion;
 import ec.edu.epn.encuentraepn.modelo.DatosReporte;
 import ec.edu.epn.encuentraepn.modelo.Reclamacion;
 import ec.edu.epn.encuentraepn.modelo.Reporte;
@@ -220,6 +221,12 @@ public class ControlRegistroReporte extends ControlBase {
         }
         reporte.renovar(LocalDate.now());
         reporteDAO.actualizar(reporte);
+    }
+
+    /**
+     * HU-22: quien registró el reporte corrige su descripción, su categoría y su lugar.
+     */
+    public void corregirReporte(Usuario actor, UUID reporteId, DatosCorreccion datos) {
     }
 
     /**
