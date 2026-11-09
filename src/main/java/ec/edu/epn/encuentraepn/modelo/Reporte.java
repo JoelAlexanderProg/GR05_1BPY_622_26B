@@ -100,6 +100,17 @@ public class Reporte {
     public void reservar() {
         cambiarEstado(EstadoReporte.ACTIVO, EstadoReporte.RESERVADO);
     }
+    
+    /**
+     * HU-22: quien publicó el reporte corrige su descripción. No puede quedar vacía ni pasar de 200 caracteres.
+     */
+    public void corregirDescripcion(String nueva) {
+        String descripcion = nueva.trim();
+        if (descripcion.isEmpty() || descripcion.length() > 200) {
+            throw new IllegalArgumentException("Escriba una descripción de hasta 200 caracteres.");
+        }
+        descripcionPublica = descripcion;
+    }
 
     // SEC-04 · 40: marcarEntregado(fecha)
     public void marcarEntregado(LocalDateTime fecha) {
