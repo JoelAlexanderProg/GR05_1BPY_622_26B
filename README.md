@@ -168,7 +168,7 @@ docs/modelos/         diagramas de clases y de secuencia del diseño
 docs/release-2.md     plan del Release 2 con la trazabilidad de cada tarea a su commit
 docs/historias/       historias de usuario del Incremento 4: tarjeta, criterios, tareas y pruebas de aceptación
 docs/integraciones/   log de Jenkins de cada integración de la iteración 5
-docs/iteracion-5/     resultados y capturas de las pruebas de aceptación de la iteración 5
+docs/iteracion-5/     reuniones, retrospectiva y capturas de las pruebas de aceptación de la iteración 5
 pruebas/              casos de prueba automatizados en el navegador (CP-01A a CP-08, Release 2 e iteración 5)
 jenkins/              imagen de Jenkins del grupo: plugins y configuración como código
 Dockerfile            imagen de la aplicación (Tomcat 10.1 con el WAR)
