@@ -14,6 +14,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -68,11 +69,13 @@ public class ControlConsultaReportes extends ControlBase {
         // SEC-02 · 3-4: consultar reportes activos [lectura]
         // SEC-02 · 10-11: consultar por tipo, categoría, fecha y zona [lectura]
         List<Reporte> reportes = reporteDAO.consultarActivos(filtros);
-        if (filtros.palabra() == null) {
-            return reportes;
-        }
-        // HU-12: búsqueda por palabra clave, sin distinguir mayúsculas, tildes ni espacios sobrantes
-        return reportes.stream().filter(reporte -> reporte.contienePalabra(filtros.palabra())).toList();
+        LocalDate hoy = LocalDate.now();
+        return reportes.stream()
+                // HU-24: los reportes vencidos dejan de mostrarse en el mapa y en la búsqueda
+                .filter(reporte -> reporte.esVisibleEnMapa(hoy))
+                // HU-12: búsqueda por palabra clave, sin distinguir mayúsculas, tildes ni espacios sobrantes
+                .filter(reporte -> filtros.palabra() == null || reporte.contienePalabra(filtros.palabra()))
+                .toList();
     }
 
     public DatosPublicos consultarDetallePublico(UUID idReporte) {

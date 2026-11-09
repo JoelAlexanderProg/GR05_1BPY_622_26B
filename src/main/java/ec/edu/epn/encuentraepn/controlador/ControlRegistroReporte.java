@@ -158,8 +158,8 @@ public class ControlRegistroReporte extends ControlBase {
             vincular(reporte, buscarPerdido(perdidoId));
         }
 
-        // SEC-01 · 10-11: publicar() → reporte ACTIVO
-        reporte.publicar();
+        // SEC-01 · 10-11: publicar() → reporte ACTIVO; HU-24: su vigencia empieza hoy
+        reporte.publicar(LocalDate.now());
 
         // Nota de SEC-01: el registro conserva el reporte y sus preguntas
         reporteDAO.guardar(reporte);
