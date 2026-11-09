@@ -109,8 +109,10 @@ public class Reporte {
 
     /**
      * HU-23: quien publicó el reporte lo renueva y vuelve a estar vigente desde ese día.
+     * Solo se renueva un reporte activo; si está reservado o retirado, lanza IllegalStateException.
      */
     public void renovar(LocalDate hoy) {
+        exigirEstado(EstadoReporte.ACTIVO);
         inicioVigencia = hoy;
     }
 
