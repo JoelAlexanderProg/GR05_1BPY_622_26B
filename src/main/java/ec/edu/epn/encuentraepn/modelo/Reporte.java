@@ -224,10 +224,10 @@ public class Reporte {
     }
 
     /**
-     * HU-24: el reporte se muestra en el mapa y en la búsqueda.
+     * HU-24: el reporte se muestra en el mapa y en la búsqueda mientras está activo y vigente.
      */
     public boolean esVisibleEnMapa(LocalDate hoy) {
-        return false;
+        return estaActivo() && estaVigente(hoy);
     }
 
     public boolean esEncontrado() {
