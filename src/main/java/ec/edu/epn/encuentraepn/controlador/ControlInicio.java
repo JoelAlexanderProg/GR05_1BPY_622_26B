@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
+import java.time.LocalDate;
 
 /**
  * Página de inicio. Al usuario identificado le muestra sus reportes y sus reclamaciones,
@@ -26,6 +27,8 @@ public class ControlInicio extends ControlBase {
         Usuario actor = actor(request);
         if (actor != null) {
             request.setAttribute("misReportes", reporteDAO.listarPorAutor(actor));
+            // HU-23: con la fecha de hoy la vista indica cuánto le queda a cada reporte para vencer
+            request.setAttribute("hoy", LocalDate.now());
             // HU-15: objetos que otras personas avisaron haber encontrado
             request.setAttribute("hallazgos", reporteDAO.listarHallazgosPara(actor));
             request.setAttribute("misReclamaciones", reclamacionDAO.listarPorReclamante(actor));
