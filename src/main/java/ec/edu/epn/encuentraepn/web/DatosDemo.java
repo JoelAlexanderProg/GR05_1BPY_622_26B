@@ -43,7 +43,7 @@ final class DatosDemo {
         Usuario bruno = usuarioDAO.obtenerORegistrar("Bruno Salas", "bruno.salas@epn.edu.ec");
         Usuario andrea = usuarioDAO.obtenerORegistrar("Andrea Paz", "andrea.paz@epn.edu.ec");
 
-        // HU-24, escenario 1: un reporte reciente se ve en el mapa
+        // HU-24, escenario 1: un reporte reciente se ve en el mapa (HU-22, escenario 1: se corrige el color del llavero)
         guardar(encontrado(bruno, 7, "Llaves", "Llaves con llavero rojo", -0.2085, -78.4890,
                 "¿Cuántas llaves tiene el llavero?"));
         // HU-24, escenarios 2 y 3: un reporte de hace tres meses que nadie renovó ya no se ve ni se encuentra
@@ -53,7 +53,12 @@ final class DatosDemo {
         guardar(perdido(bruno, 55, "Calculadoras", "Calculadora Casio fx-991 gris", -0.2105, -78.4880));
         // HU-23, escenario 2: un reporte vencido que su autor puede renovar
         guardar(perdido(bruno, 70, "Electrónicos", "Audífonos inalámbricos blancos", -0.2115, -78.4895));
-        // HU-23, escenario 3: un reporte reservado porque su autor aceptó la reclamación del dueño
+        // HU-22, escenario 2: un cuaderno marcado por error en otro edificio (zona Sur en vez de zona Norte)
+        guardar(perdido(bruno, 10, "Útiles", "Cuaderno universitario de cuadros con pasta verde", -0.2132, -78.4910));
+        // HU-22, escenario 3: un cargador publicado en la categoría «Otros»
+        guardar(encontrado(bruno, 5, "Otros", "Cargador de laptop negro", -0.2100, -78.4865,
+                "¿De qué marca es?"));
+        // HU-23, escenario 3, y HU-22, escenario 4: un reporte reservado porque su autor aceptó la reclamación del dueño
         Reporte mochila = encontrado(bruno, 58, "Ropa y accesorios", "Mochila negra con el logo de la EPN",
                 -0.2120, -78.4875, "¿Qué hay en el bolsillo pequeño?");
         mochila.reservar();
